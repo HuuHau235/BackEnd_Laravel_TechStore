@@ -12,6 +12,7 @@ class CreateProductsTable extends Migration
             $table->id();
             $table->string('name');
             $table->decimal('price', 10, 2);
+            $table->string('color')->nullable();
             $table->decimal('old_price', 10, 2)->nullable();
             $table->text('description')->nullable();
             $table->unsignedBigInteger('category_id');
