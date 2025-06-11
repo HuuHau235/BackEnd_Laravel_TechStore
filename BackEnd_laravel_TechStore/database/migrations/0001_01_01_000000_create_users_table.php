@@ -16,6 +16,7 @@ class CreateUsersTable extends Migration
             $table->string('role')->comment('User roles: user or admin');
             $table->string('address')->nullable();
             $table->string('phone')->nullable();
+            $table->string('avatar')->nullable();
             $table->timestamps();
         });
     }

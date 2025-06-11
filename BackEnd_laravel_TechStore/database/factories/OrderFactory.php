@@ -11,7 +11,7 @@ class OrderFactory extends Factory
         return [
             'user_id' => \App\Models\User::factory(),
             'order_date' => now(),
-            'status' => $this->faker->randomElement(['pending', 'processing', 'completed', 'cancelled']),
+            'status' => $this->faker->randomElement(['processing', 'completed', 'cancelled']),
             'total_amount' => $this->faker->randomFloat(2, 100, 5000),
             'created_at' => now(),
         ];

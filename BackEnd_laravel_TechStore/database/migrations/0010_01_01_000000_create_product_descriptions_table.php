@@ -11,9 +11,9 @@ class CreateProductDescriptionsTable extends Migration
         Schema::create('product_descriptions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_id')->index();
-            $table->string('name');             // Tên sản phẩm
-            $table->text('description');        // Mô tả sản phẩm
-            $table->text('features');           // Tính năng nổi bật
+            $table->string('name');
+            $table->text('description');     
+            $table->text('features');          
             $table->timestamps();
 
             $table->foreign('product_id')
