@@ -17,6 +17,7 @@ class UserFactory extends Factory
             'role' => $this->faker->randomElement(['user', 'admin']),
             'address' => $this->faker->address(),
             'phone' => $this->faker->phoneNumber(),
+            'avatar' => $this->faker->imageUrl(640, 480, 'nature'),
             'created_at' => now(),
         ];
     }

@@ -10,6 +10,7 @@ class CategoryFactory extends Factory
     {
         return [
             'name' => $this->faker->word(),
+            'image_url' => $this->faker->imageUrl(640, 480, 'nature'),
             'created_at' => now(),
         ];
     }
