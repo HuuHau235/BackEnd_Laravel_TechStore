@@ -18,7 +18,6 @@ class Product extends Model
         'category_id',
         'stock',
         'status',
-        'image_url',
         'start_date',
         'end_date',
     ];
