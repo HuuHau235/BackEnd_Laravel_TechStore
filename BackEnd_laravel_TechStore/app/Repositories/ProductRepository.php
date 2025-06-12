@@ -6,8 +6,18 @@ use App\Models\Product;
 
 class ProductRepository
 {
-    public function getAllProducts()
+    public function getPromotedProductsByTypes(array $types, int $limitPerType = 4)
     {
-        return Product::all();
+        $result = [];
+
+        foreach ($types as $type) {
+            $products = Product::where('promotion_type', $type)
+                ->limit($limitPerType)
+                ->get();
+            $result[$type] = $products;
+        }
+
+        return $result;
     }
 }
+

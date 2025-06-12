@@ -2,12 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Services\ProductService;
 
-class ProductController extends Controller
+class  ProductController extends Controller
 {
-    public function index()
+    protected $productService;
+
+    public function __construct(ProductService $productService)
     {
-        return response()->json(['message' => 'Product list']);
+        $this->productService = $productService;
+    }
+
+    public function getPromotedProducts()
+    {
+        $products = $this->productService->getPromotedProducts();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $products
+        ]);
     }
 }
+
