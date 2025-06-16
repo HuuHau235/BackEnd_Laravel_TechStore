@@ -36,4 +36,8 @@ class Product extends Model
     {
         return $this->hasMany(Review::class);
     }
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class, 'product_id');
+    }
 }
