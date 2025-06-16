@@ -2,18 +2,19 @@
 
 namespace App\Services;
 
-use App\Models\Product;
+use App\Repositories\ProductRepository;
 
 class ProductService
 {
-    public function getProductsByCategory()
+    protected $productRepository;
+
+    public function __construct(ProductRepository $productRepository)
     {
-        return Product::select('id', 'name', 'price', 'category_id')
-            ->where('status', 'active')
-            ->orderBy('category_id')
-            ->limit(12)
-            ->get()
-            ->groupBy('category_id');
+        $this->productRepository = $productRepository;
+    }
+
+    public function getPromotedProducts()
+    {
+        return $this->productRepository->getProductsByPromotionType();
     }
 }
-
