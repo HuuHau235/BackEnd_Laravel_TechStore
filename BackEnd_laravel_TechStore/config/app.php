@@ -213,5 +213,7 @@ return [
         // 'ExampleClass' => App\Example\ExampleClass::class,
     ])->toArray(),
 
+    'Socialite' => Laravel\Socialite\Facades\Socialite::class,
+
 ];
 
