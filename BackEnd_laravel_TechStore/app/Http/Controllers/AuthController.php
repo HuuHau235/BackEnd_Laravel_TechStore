@@ -62,8 +62,41 @@ class AuthController extends Controller
 
         $token = $this->service->handleGoogleLogin($googleUser);
         
-        // Chuyển về phía React kèm theo token
-        return redirect('http://localhost:3000/auth/callback?token=' . $token);
+        return redirect('http://localhost:3000/callback?token=' . $token);
+    }
+
+    public function login(Request $request){
+        $data = $request->validate([
+            'name' => 'required|string',
+            'password' => 'required|string|min:6',
+        ]);
+
+        $result = $this->service->login($data);
+
+        return response()->json([
+            'user' => $result['user'],
+            'role' => $result['role'],
+            'token' =>$result['token'],
+        ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $this->service->resetPassword($data);
+
+        return response()->json([
+            'message' => 'Password has been reset successfully.'
+        ]);
+    }
+
+    public function logout(Request $request){
+        $request->user()->currentAccessToken()->delete();
+        return response()->json(['message' => 'Logged out successfully.']);
     }
 }
 

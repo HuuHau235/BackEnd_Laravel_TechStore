@@ -6,6 +6,7 @@ use App\Repositories\AuthRepository;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
+ use Illuminate\Http\Exceptions\HttpResponseException;
 use App\Mail\SendOtpMail;
 use Illuminate\Support\Str;
 
@@ -114,4 +115,35 @@ class AuthService
         return $user->createToken('web')->plainTextToken;
     }
 
+    public function login(array $credentials)
+    {
+        $result = $this->repository->findUserByName($credentials['name']);
+
+        if (!$result || !$this->repository->validatePassword($result['user'], $credentials['password'])) {
+            throw new HttpResponseException(response()->json([
+                'message' => 'Fullname hoặc mật khẩu không chính xác.'
+            ], 401)); 
+        }
+
+        $token = $result['user']->createToken($result['role'] . '-token')->plainTextToken;
+
+        return [
+            'user' => $result['user'],
+            'role' => $result['role'],
+            'token' => $token,
+        ];
+    }
+
+    public function resetPassword(array $data): void
+    {
+        $userData = $this->repository->findUserByName($data['name']);
+
+        if (!$userData) {
+            throw ValidationException::withMessages(['name' => 'User not found.']);
+        }
+
+        $user = $userData['user'];
+        $user->password = Hash::make($data['password']);
+        $user->save();
+    }
 }

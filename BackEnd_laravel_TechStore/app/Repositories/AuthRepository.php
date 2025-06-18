@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Repositories;
-
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
 class AuthRepository
@@ -22,5 +22,21 @@ class AuthRepository
             'name' => $name,
             'password' => $hashedPass
         ]);
+    }
+
+    public function findUserByName(string $name): ?array
+    {
+        $user = User::where('name', $name)->first();
+
+        if ($user) {
+            return ['user' => $user, 'role' => $user->role];
+        }
+
+        return null;
+    }
+
+    public function validatePassword($user, $password): bool
+    {
+        return Hash::check($password, $user->password);
     }
 }
