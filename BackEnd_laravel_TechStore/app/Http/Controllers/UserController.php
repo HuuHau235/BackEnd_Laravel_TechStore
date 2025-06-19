@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\UserService;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class UserController extends Controller
 {
@@ -13,14 +15,29 @@ class UserController extends Controller
     {
         $this->userService = $userService;
     }
-
-    public function getUser($id)
+public function getCurrentUserId()
     {
         try {
-            $user = $this->userService->findById($id);
+            $user = Auth::guard('user')->user();
+            if (!$user) {
+                return response()->json(['message' => 'User not authenticated'], 401);
+            }
+
+            $userId = $user->id;
+
+            return response()->json(['userId' => $userId], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getUserById($id)
+    {
+        try {
+            $user = User::find($id);
 
             if (!$user) {
-                return response()->json(['error' => 'User not found'], 404);
+                return response()->json(['message' => 'User not found'], 404);
             }
 
             return response()->json(['data' => $user], 200);
