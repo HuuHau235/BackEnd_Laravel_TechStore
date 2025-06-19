@@ -64,7 +64,8 @@ Route::middleware('auth:sanctum')->prefix('user')->group(function () {
 
 
 Route::prefix('user')->group(function (){
-    Route::get('/{id}', [UserController::class, 'getUser']);
+    Route::get('/getUserId', [UserController::class, 'getCurrentUserId']);
+    Route::get('/{id}', [UserController::class, 'getUserById']);
     Route::put('/update-profile/{id}', [UserController::class, 'updateProfile']); 
     Route::put('/change-password/{id}', [UserController::class, 'changePassword']); 
     Route::put('/update-avatar/{id}', [UserController::class, 'updateAvatar']);
