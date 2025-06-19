@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,3 +61,13 @@ Route::middleware('auth:sanctum')->prefix('user')->group(function () {
     // Route::get('/dashboard', [AdminController::class, 'getStats']);
     // Minh họa những cái bỏ vào auth:sanctum là đã đăng nhập rồi mới có
 });
+
+
+Route::prefix('user')->group(function (){
+    Route::get('/{id}', [UserController::class, 'getUser']);
+    Route::put('/update-profile/{id}', [UserController::class, 'updateProfile']); 
+    Route::put('/change-password/{id}', [UserController::class, 'changePassword']); 
+    Route::put('/update-avatar/{id}', [UserController::class, 'updateAvatar']);
+
+});
+    
