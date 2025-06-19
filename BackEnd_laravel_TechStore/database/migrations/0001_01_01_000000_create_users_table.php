@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // Họ tên
+            $table->string('name'); 
             $table->string('email')->unique();
-            $table->string('password'); // Mật khẩu (đã được hash)
+            $table->string('password'); 
 
             $table->integer('email_otp')->nullable();
             $table->boolean('email_verified')->default(false);
-            $table->string('role')->default('user'); // "user" hoặc "admin"
+            $table->string('role')->default('user'); 
 
             $table->string('address')->nullable();
             $table->string('phone')->nullable();
