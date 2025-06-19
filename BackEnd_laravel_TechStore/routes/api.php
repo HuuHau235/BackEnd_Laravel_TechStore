@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\BlogContronller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -19,6 +21,14 @@ use App\Http\Controllers\UserController;
 Route::prefix('products')->group(function () {
     Route::get('/promoted-aboutus', [ProductController::class, 'getPromotedProducts']);
 });
+// ==============================
+// AUTH ROUTES (Blog)
+// ==============================
+Route::get('/blogs', [BlogContronller::class, 'index']);
+Route::get('/blogs/status', [BlogContronller::class, 'getStatusBlog']);
+
+
+Route::get('/blogs/categories', [CategoryController::class, 'getCategoriesByID']);
 
 
 
@@ -71,4 +81,3 @@ Route::prefix('user')->group(function (){
     Route::put('/update-avatar/{id}', [UserController::class, 'updateAvatar']);
 
 });
-    
