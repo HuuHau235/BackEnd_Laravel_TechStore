@@ -20,6 +20,10 @@ use App\Http\Controllers\UserController;
 // ==============================
 Route::prefix('products')->group(function () {
     Route::get('/promoted-aboutus', [ProductController::class, 'getPromotedProducts']);
+    Route::get('/list', [ProductController::class, 'getAllProduct']);
+    Route::get('/top-five', [ProductController::class, 'getTopFiveProducts']);
+    Route::get('/top-images', [ProductController::class, 'getAllProduct']);
+    Route::get('/search', [ProductController::class, 'getProductByKeyWord']);
 });
 // ==============================
 // AUTH ROUTES (Blog)
