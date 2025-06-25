@@ -6,6 +6,7 @@ use App\Services\ProductService;
 use App\Models\Product; 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -29,28 +30,107 @@ class ProductController extends Controller
         }
     }
 
-     public function getAllProduct(Request $request): JsonResponse
-{
-    try {
-        $categoryId = $request->query('category_id');
-        $perPage = $request->query('per_page', 15);
+    public function getItemInProductCartByUserId(Request $request)
+    {
+        try {
+            $user = Auth::guard('user')->user();
 
-        $query = Product::query();
+            if (!$user) {
+                return response()->json(['message' => 'User not authenticated'], 401);
+            }
 
-        if ($categoryId) {
-            $query->where('category_id', $categoryId);
+            $userId = $user->id;
+
+            $cartItems = $this->productService->getUserCart($userId);
+
+            return response()->json([
+                'data' => $cartItems
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function updateQuantity(Request $request, $cartId)
+    {
+        try {
+            $quantity = $request->input('quantity');
+
+            $this->productService->updateCartItemQuantity($cartId, $quantity);
+
+            return response()->json(['message' => 'Cart quantity updated successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
+    }
+
+    public function removeCartItem($id)
+    {
+        $this->productService->deleteCartItem($id);
+        return response()->json(['message' => 'Removed']);
+    }
+
+    public function emptyCart(Request $request)
+    {
+        try {
+            $user = Auth::guard('user')->user();
+            if (!$user) {
+                return response()->json(['message' => 'User not authenticated'], 401);
+            }
+
+            $this->productService->clearUserCart($user->id);
+
+            return response()->json(['message' => 'Cart cleared successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function applyCoupon(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string'
+        ]);
+
+        $coupon = $this->productService->applyCoupon($request->code);
+
+        if (!$coupon) {
+            return response()->json(['message' => 'Invalid or expired coupon.'], 400);
         }
 
-        $products = $query->with('images')->paginate($perPage);
-
-        return response()->json($products, 200);
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'Error fetching products',
-            'error' => $e->getMessage(),
-        ], 500);
+        return response()->json(['coupon' => $coupon], 200);
     }
-}
+
+    public function checkout(Request $request)
+    {
+        return $this->productService->processCheckout($request);
+    }
+
+
+
+    public function getAllProduct(Request $request): JsonResponse
+    {
+        try {
+            $categoryId = $request->query('category_id');
+            $perPage = $request->query('per_page', 15);
+
+            $query = Product::query();
+
+            if ($categoryId) {
+                $query->where('category_id', $categoryId);
+            }
+
+            $products = $query->with('images')->paginate($perPage);
+
+            return response()->json($products, 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error fetching products',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
     
     public function getTopFiveProducts(): JsonResponse
     {
@@ -66,14 +146,13 @@ class ProductController extends Controller
     }
     
     public function getProductByKeyWord(Request $request): JsonResponse
-{
-    $keyword = $request->query('q');
+    {
+        $keyword = $request->query('q');
 
-    $products = Product::where('name', 'like', "%$keyword%")
-        ->with('images') 
-        ->get();
+        $products = Product::where('name', 'like', "%$keyword%")
+            ->with('images') 
+            ->get();
 
-    return response()->json($products);
-}
-
+        return response()->json($products);
+    }
 }
