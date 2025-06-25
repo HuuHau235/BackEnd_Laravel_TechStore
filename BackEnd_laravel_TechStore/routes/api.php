@@ -24,13 +24,15 @@ Route::prefix('products')->group(function () {
     Route::get('/top-five', [ProductController::class, 'getTopFiveProducts']);
     Route::get('/top-images', [ProductController::class, 'getAllProduct']);
     Route::get('/search', [ProductController::class, 'getProductByKeyWord']);
+    Route::get('/all-categories', [CategoryController::class, 'index']);
+
 });
 // ==============================
 // AUTH ROUTES (Blog)
 // ==============================
 Route::get('/blogs', [BlogContronller::class, 'index']);
 Route::get('/blogs/status', [BlogContronller::class, 'getStatusBlog']);
-
+Route::get('/categories/all-categories', [CategoryController::class, 'index']);
 
 Route::get('/blogs/categories', [CategoryController::class, 'getCategoriesByID']);
 
