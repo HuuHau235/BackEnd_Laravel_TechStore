@@ -23,5 +23,6 @@ class DatabaseSeeder extends Seeder
         \App\Models\ProductColor::factory(10)->create();
         \App\Models\ProductCart::factory(10)->create();
         \App\Models\Author::factory(10)->create();
+        \App\Models\Coupon::factory(10)->create();
     }
 }
