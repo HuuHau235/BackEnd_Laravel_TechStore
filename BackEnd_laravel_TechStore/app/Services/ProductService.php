@@ -17,4 +17,14 @@ class ProductService
     {
         return $this->productRepository->getProductsByPromotionType();
     }
+    public function getAllProductsWithImages()
+    {
+        return $this->productRepository->getAllProductsWithImages();
+    }
+
+    public function getTopFiveProducts()
+    {
+        return $this->productRepository->getTopFiveProducts();
+    }
+    
 }
