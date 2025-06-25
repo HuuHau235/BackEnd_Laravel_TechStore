@@ -33,4 +33,17 @@ class ProductRepository
             ->merge($summerSaleProducts)
             ->merge($bestDealProducts);
     }
+
+    public function getAllProductsWithImages()
+    {
+        return Product::with('images')->get();
+    }
+
+    public function getTopFiveProducts()
+    {
+        return Product::with('images') 
+            ->orderBy('created_at', 'desc') 
+            ->take(5)
+            ->get();
+    }
 }
