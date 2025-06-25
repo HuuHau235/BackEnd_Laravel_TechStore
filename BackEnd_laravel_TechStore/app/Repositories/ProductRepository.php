@@ -100,4 +100,16 @@ class ProductRepository
         Product::where('id', $productId)->decrement('stock', $qty);
     }
 
+    public function getAllProductsWithImages()
+    {
+        return Product::with('images')->get();
+    }
+
+    public function getTopFiveProducts()
+    {
+        return Product::with('images') 
+            ->orderBy('created_at', 'desc') 
+            ->take(5)
+            ->get();
+    }
 }
