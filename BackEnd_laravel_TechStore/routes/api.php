@@ -67,15 +67,19 @@ Route::middleware('auth:sanctum')->prefix('auth')->group(function () {
 // ==============================
 Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     // Route::get('/dashboard', [AdminController::class, 'getStats']);
-    // Minh họa những cái bỏ vào auth:sanctum là đã đăng nhập rồi mới có
+
 });
 
 // ==============================
 // USER ROUTES (Protected)
 // ==============================
 Route::middleware('auth:sanctum')->prefix('user')->group(function () {
-    // Route::get('/dashboard', [AdminController::class, 'getStats']);
-    // Minh họa những cái bỏ vào auth:sanctum là đã đăng nhập rồi mới có
+    Route::get('/cart', [ProductController::class, 'getItemInProductCartByUserId']);
+    Route::put('/cart/{id}/quantity', [ProductController::class, 'updateQuantity']);
+    Route::delete('/cart/{id}', [ProductController::class, 'removeCartItem']);
+    Route::delete('/cart', [ProductController::class, 'emptyCart']);
+    Route::post('/cart/apply-coupon', [ProductController::class, 'applyCoupon']);
+    Route::post('/cart/checkout', [ProductController::class, 'checkout']);
 });
 
 
@@ -85,5 +89,4 @@ Route::prefix('user')->group(function (){
     Route::put('/update-profile/{id}', [UserController::class, 'updateProfile']); 
     Route::put('/change-password/{id}', [UserController::class, 'changePassword']); 
     Route::put('/update-avatar/{id}', [UserController::class, 'updateAvatar']);
-
 });
