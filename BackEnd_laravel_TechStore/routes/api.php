@@ -21,6 +21,12 @@ use App\Http\Controllers\UserController;
 // ==============================
 Route::prefix('products')->group(function () {
     Route::get('/promoted-aboutus', [ProductController::class, 'getPromotedProducts']);
+    Route::get('/list', [ProductController::class, 'getAllProduct']);
+    Route::get('/top-five', [ProductController::class, 'getTopFiveProducts']);
+    Route::get('/top-images', [ProductController::class, 'getAllProduct']);
+    Route::get('/search', [ProductController::class, 'getProductByKeyWord']);
+    Route::get('/all-categories', [CategoryController::class, 'index']);
+
 });
 
 // ==============================
@@ -52,23 +58,29 @@ Route::middleware('auth:sanctum')->prefix('auth')->group(function () {
 // ==============================
 Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     // Route::get('/dashboard', [AdminController::class, 'getStats']);
-    // Minh họa những cái bỏ vào auth:sanctum là đã đăng nhập rồi mới có
+
 });
 
 // ==============================
 // USER ROUTES (Protected)
 // ==============================
 Route::middleware('auth:sanctum')->prefix('user')->group(function () {
-    // Route::get('/dashboard', [AdminController::class, 'getStats']);
-    // Minh họa những cái bỏ vào auth:sanctum là đã đăng nhập rồi mới có
+    Route::get('/cart', [ProductController::class, 'getItemInProductCartByUserId']);
+    Route::put('/cart/{id}/quantity', [ProductController::class, 'updateQuantity']);
+    Route::delete('/cart/{id}', [ProductController::class, 'removeCartItem']);
+    Route::delete('/cart', [ProductController::class, 'emptyCart']);
+    Route::post('/cart/apply-coupon', [ProductController::class, 'applyCoupon']);
+    Route::post('/cart/checkout', [ProductController::class, 'checkout']);
 });
 
 
 Route::prefix('user')->group(function () {
-    Route::get('/{id}', [UserController::class, 'getUser']);
+    Route::get('/getUserId', [UserController::class, 'getCurrentUserId']);
+    Route::get('/{id}', [UserController::class, 'getUserById']);
     Route::put('/update-profile/{id}', [UserController::class, 'updateProfile']);
     Route::put('/change-password/{id}', [UserController::class, 'changePassword']);
     Route::put('/update-avatar/{id}', [UserController::class, 'updateAvatar']);
+
     // Blogs
     Route::get('/blogs/index', [BlogContronller::class, 'index']);
     Route::get('/blogs/status', [BlogContronller::class, 'getStatusBlog']);
@@ -80,5 +92,5 @@ Route::prefix('user')->group(function () {
     Route::get('/product/index', [ProductController::class, 'index']);
     Route::get('/product/promoted', [ProductController::class, 'getPromotedProducts']);
     Route::get('/product/categories', [ProductController::class, 'getProductCategories']);
-
 });
+
