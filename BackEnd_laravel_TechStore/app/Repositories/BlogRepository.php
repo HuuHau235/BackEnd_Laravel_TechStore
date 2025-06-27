@@ -26,4 +26,8 @@ class BlogRepository
             ->take($limit)
             ->get();
     }
+     public function findById($id)
+    {
+        return Blog::find($id);
+    }
 }
