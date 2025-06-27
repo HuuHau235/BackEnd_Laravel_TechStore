@@ -40,6 +40,7 @@ Route::prefix('auth')->group(function () {
 });
 
 
+
 // ==============================
 // AUTH ROUTES (Protected via Sanctum)
 // ==============================
