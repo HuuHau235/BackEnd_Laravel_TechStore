@@ -24,4 +24,9 @@ class CategoryController extends Controller
         $categories = $this->categoryService->getCategoriesByID();
         return response()->json($categories);
     }
+    public function GetImage()
+    {
+        $categories = Category::all(['id','name','image_url']); 
+        return response()->json($categories);
+    }
 }
