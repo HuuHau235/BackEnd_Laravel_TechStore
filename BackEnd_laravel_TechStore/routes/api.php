@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\BlogContronller;
+use App\Http\Controllers\SearchController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -27,16 +28,6 @@ Route::prefix('products')->group(function () {
     Route::get('/all-categories', [CategoryController::class, 'index']);
 
 });
-// ==============================
-// AUTH ROUTES (Blog)
-// ==============================
-Route::get('/blogs', [BlogContronller::class, 'index']);
-Route::get('/blogs/status', [BlogContronller::class, 'getStatusBlog']);
-Route::get('/categories/all-categories', [CategoryController::class, 'index']);
-
-Route::get('/blogs/categories', [CategoryController::class, 'getCategoriesByID']);
-
-
 
 // ==============================
 // AUTH ROUTES (Public)
@@ -83,10 +74,23 @@ Route::middleware('auth:sanctum')->prefix('user')->group(function () {
 });
 
 
-Route::prefix('user')->group(function (){
+Route::prefix('user')->group(function () {
     Route::get('/getUserId', [UserController::class, 'getCurrentUserId']);
     Route::get('/{id}', [UserController::class, 'getUserById']);
-    Route::put('/update-profile/{id}', [UserController::class, 'updateProfile']); 
-    Route::put('/change-password/{id}', [UserController::class, 'changePassword']); 
+    Route::put('/update-profile/{id}', [UserController::class, 'updateProfile']);
+    Route::put('/change-password/{id}', [UserController::class, 'changePassword']);
     Route::put('/update-avatar/{id}', [UserController::class, 'updateAvatar']);
+
+    // Blogs
+    Route::get('/blogs/index', [BlogContronller::class, 'index']);
+    Route::get('/blogs/status', [BlogContronller::class, 'getStatusBlog']);
+    Route::get('/blogs/categories', [CategoryController::class, 'getCategoriesByID']);
+    Route::get('/blog/{id}', [BlogContronller::class, 'show']);
+    // search 
+    Route::get('/search/index', [SearchController::class, 'multiSearch']);
+    // Products
+    Route::get('/product/index', [ProductController::class, 'index']);
+    Route::get('/product/promoted', [ProductController::class, 'getPromotedProducts']);
+    Route::get('/product/categories', [ProductController::class, 'getProductCategories']);
 });
+

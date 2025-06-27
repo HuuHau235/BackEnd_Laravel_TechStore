@@ -1,5 +1,5 @@
 <?php
-
+use Illuminate\Support\Facades\Auth;
 return [
 
     /*
@@ -81,7 +81,7 @@ return [
 
         'admins' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Admin::class,
+            // 'model' => App\Models\Admin::class,
         ],
     ],
 
