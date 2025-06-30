@@ -27,6 +27,7 @@ Route::prefix('products')->group(function () {
     Route::get('/all-categories', [CategoryController::class, 'index']);
 
 });
+
 // ==============================
 // AUTH ROUTES (Blog)
 // ==============================
@@ -35,8 +36,6 @@ Route::get('/blogs/status', [BlogContronller::class, 'getStatusBlog']);
 Route::get('/categories/all-categories', [CategoryController::class, 'index']);
 
 Route::get('/blogs/categories', [CategoryController::class, 'getCategoriesByID']);
-
-
 
 // ==============================
 // AUTH ROUTES (Public)
@@ -47,7 +46,6 @@ Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 });
-
 
 // ==============================
 // AUTH ROUTES (Protected via Sanctum)
@@ -60,7 +58,6 @@ Route::middleware('auth:sanctum')->prefix('auth')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });
-
 
 // ==============================
 // ADMIN ROUTES (Protected)
@@ -82,7 +79,6 @@ Route::middleware('auth:sanctum')->prefix('user')->group(function () {
     Route::post('/cart/checkout', [ProductController::class, 'checkout']);
 });
 
-
 Route::prefix('user')->group(function (){
     Route::get('/getUserId', [UserController::class, 'getCurrentUserId']);
     Route::get('/{id}', [UserController::class, 'getUserById']);
@@ -90,3 +86,4 @@ Route::prefix('user')->group(function (){
     Route::put('/change-password/{id}', [UserController::class, 'changePassword']); 
     Route::put('/update-avatar/{id}', [UserController::class, 'updateAvatar']);
 });
+
