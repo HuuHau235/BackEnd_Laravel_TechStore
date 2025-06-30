@@ -33,4 +33,5 @@ class BlogContronller extends Controller
 
         return response()->json($blog);
     }
+    
 }

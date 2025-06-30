@@ -21,6 +21,7 @@ class BlogRepository
     public function getBlogStatus($limit = 3)
     {
         return $this->blogModel
+        ->with('author') 
             ->where("status", "Lastest New")
             ->orderBy("publish_date", "desc")
             ->take($limit)
