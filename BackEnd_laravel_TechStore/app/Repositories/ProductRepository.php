@@ -130,6 +130,37 @@ class ProductRepository
         Product::where('id', $productId)->decrement('stock', $qty);
     }
 
+    public function findProductById($productId)
+    {
+        return Product::find($productId);
+    }
+
+    public function addOrUpdateCart($userId, $productId, $quantity)
+    {
+        $cartItem = ProductCart::where('user_id', $userId)
+                    ->where('product_id', $productId)
+                    ->first();
+
+        if ($cartItem) {
+            $cartItem->quantity += $quantity;
+            $cartItem->save();
+            return $cartItem;
+        }
+
+        return ProductCart::create([
+            'user_id' => $userId,
+            'product_id' => $productId,
+            'quantity' => $quantity,
+        ]);
+    }
+
+    public function deleteCartItems($userId, array $cartItemIds)
+    {
+        return ProductCart::where('user_id', $userId)
+            ->whereIn('id', $cartItemIds)
+            ->delete();
+    }
+
     public function getAllProductsWithImages()
     {
         return Product::with('images')->get();

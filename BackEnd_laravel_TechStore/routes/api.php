@@ -28,7 +28,6 @@ Route::prefix('products')->group(function () {
     Route::get('/all-categories', [CategoryController::class, 'index']);
 
 });
-
 // ==============================
 // AUTH ROUTES (Public)
 // ==============================
@@ -44,6 +43,7 @@ Route::prefix('auth')->group(function () {
 // ==============================
 // AUTH ROUTES (Protected via Sanctum)
 // ==============================
+
 Route::middleware('auth:sanctum')->prefix('auth')->group(function () {
     // Lấy thông tin người dùng đã đăng nhập
     Route::get('/user', function (Request $request) {
@@ -52,7 +52,6 @@ Route::middleware('auth:sanctum')->prefix('auth')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });
-
 
 // ==============================
 // ADMIN ROUTES (Protected)
@@ -65,6 +64,7 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
 // ==============================
 // USER ROUTES (Protected)
 // ==============================
+
 Route::middleware('auth:sanctum')->prefix('user')->group(function () {
     Route::get('/cart', [ProductController::class, 'getItemInProductCartByUserId']);
     Route::put('/cart/{id}/quantity', [ProductController::class, 'updateQuantity']);
@@ -72,8 +72,8 @@ Route::middleware('auth:sanctum')->prefix('user')->group(function () {
     Route::delete('/cart', [ProductController::class, 'emptyCart']);
     Route::post('/cart/apply-coupon', [ProductController::class, 'applyCoupon']);
     Route::post('/cart/checkout', [ProductController::class, 'checkout']);
+    Route::post('/cart/add', [ProductController::class, 'addToCart']);
 });
-
 
 Route::prefix('user')->group(function () {
     Route::get('/getUserId', [UserController::class, 'getCurrentUserId']);
@@ -94,4 +94,5 @@ Route::prefix('user')->group(function () {
     Route::get('/product/promoted', [ProductController::class, 'getPromotedProducts']);
     Route::get('/product/categories', [ProductController::class, 'getProductCategories']);
 });
+
 
