@@ -17,4 +17,8 @@ class BlogService {
     public function getBlogOFStatus(){
         return $this ->blogRepository ->getBlogStatus();
     }
+    public function getBlogById($id)
+    {
+        return $this->blogRepository->findById($id);
+    }
 }
