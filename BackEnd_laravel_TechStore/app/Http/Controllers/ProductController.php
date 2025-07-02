@@ -144,6 +144,74 @@ class ProductController extends Controller
 
     }
 
+    // public function addToCart(Request $request)
+    // {
+    //     try {
+    //         $request->validate([
+    //             'product_id' => 'required|exists:products,id',
+    //             'quantity' => 'required|integer|min:1'
+    //         ]);
+
+    //         $user = Auth::guard('user')->user();
+    //         if (!$user) {
+    //             return response()->json(['message' => 'User not authenticated'], 401);
+    //         }
+
+    //         $cartItem = $this->productService->addToCart(
+    //             $user->id,
+    //             $request->product_id,
+    //             $request->quantity
+    //         );
+
+    //         return response()->json([
+    //             'message' => 'Product added to cart successfully.',
+    //             'data' => $cartItem
+    //         ]);
+    //     } catch (\Illuminate\Validation\ValidationException $e) {
+    //         return response()->json(['errors' => $e->errors()], 422);
+    //     } catch (\Exception $e) {
+    //         return response()->json(['error' => $e->getMessage()], 500);
+    //     }
+    // }
+
+    public function addToCart(Request $request)
+    {
+        try {
+            $request->validate([
+                'product_id' => 'required|exists:products,id',
+                'quantity' => 'required|integer|min:1'
+            ]);
+
+            $user = Auth::guard('user')->user();
+            if (!$user) {
+                return response()->json(['message' => 'User not authenticated'], 401);
+            }
+
+            $cartItem = $this->productService->addToCart(
+                $user->id,
+                $request->product_id,
+                $request->quantity
+            );
+
+            return response()->json([
+                'message' => 'Product added to cart successfully.',
+                'data' => $cartItem
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            // ✅ THÊM XỬ LÝ LỖI HẾT HÀNG
+            if (
+                str_contains($e->getMessage(), 'exceeds available stock') ||
+                str_contains($e->getMessage(), 'Product not found')
+            ) {
+                return response()->json(['message' => $e->getMessage()], 400);
+            }
+
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
 
     public function getAllProduct(Request $request): JsonResponse
     {

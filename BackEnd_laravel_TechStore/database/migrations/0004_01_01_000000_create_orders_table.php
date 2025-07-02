@@ -17,12 +17,12 @@ class CreateOrdersTable extends Migration
             $table->decimal('total_amount', 10, 2);
 
             // ✅ Thêm thông tin người nhận hàng ở đây:
-          $table->string('full_name')->nullable();
-$table->string('phone')->nullable();
-$table->string('address')->nullable();
-$table->string('province')->nullable();
-$table->string('district')->nullable();
-$table->string('ward')->nullable();
+            $table->string('full_name')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('address')->nullable();
+            $table->string('province')->nullable();
+            $table->string('district')->nullable();
+            $table->string('ward')->nullable();
 
             $table->timestamps();
 
