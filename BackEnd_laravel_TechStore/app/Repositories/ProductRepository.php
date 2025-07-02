@@ -69,11 +69,18 @@ class ProductRepository
             ->values();
     }
 
+    // public function getCartItemsByUser($userId)
+    // {
+    //     return ProductCart::with('product.firstImage')  /* lấy từ hàm firstImage bên trong Product model */
+    //     ->where('user_id', $userId)
+    //     ->get();
+    // }
+
     public function getCartItemsByUser($userId)
     {
-        return ProductCart::with('product.firstImage')  /* lấy từ hàm firstImage bên trong Product model */
-        ->where('user_id', $userId)
-        ->get();
+        return ProductCart::with(['product', 'product.firstImage']) // <-- thêm 'product' để có stock
+            ->where('user_id', $userId)
+            ->get();
     }
 
     public function findWithProduct($cartId)
