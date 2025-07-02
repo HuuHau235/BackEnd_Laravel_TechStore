@@ -141,7 +141,7 @@ class ProductController extends Controller
     public function checkout(Request $request)
     {
         return $this->productService->processCheckout($request);
-        
+
     }
 
 

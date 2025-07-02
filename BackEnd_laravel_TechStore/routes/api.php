@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\BlogContronller;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -93,5 +94,10 @@ Route::prefix('user')->group(function () {
     Route::get('/product/index', [ProductController::class, 'index']);
     Route::get('/product/promoted', [ProductController::class, 'getPromotedProducts']);
     Route::get('/product/categories', [ProductController::class, 'getProductCategories']);
+
+    // Order
+    Route::post('/orders/create', [OrderController::class, 'createOrder']);
+Route::put('/orders/{orderId}/update-info', [OrderController::class, 'updateOrderInfo']);
+
 });
 

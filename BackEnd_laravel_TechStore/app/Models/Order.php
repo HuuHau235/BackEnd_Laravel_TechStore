@@ -16,7 +16,15 @@ class Order extends Model
         'shipping_option',
         'total_amount',
         'coupon_code',
-        'discount'
+        'discount',
+
+         // Thông tin người nhận hàng
+        'full_name',
+        'phone',
+        'address',
+        'province',
+        'district',
+        'ward'
     ];
 
     public function user()
