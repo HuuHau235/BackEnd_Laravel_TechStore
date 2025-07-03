@@ -1,38 +1,105 @@
 <?php
+
 namespace App\Services;
 
 use App\Repositories\OrderRepository;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Str;
 
 class OrderService
 {
-    protected $orderRepo;
+    protected $orderRepository;
 
-    public function __construct(OrderRepository $orderRepo)
+    public function __construct(OrderRepository $orderRepository)
     {
-        $this->orderRepo = $orderRepo;
+        $this->orderRepository = $orderRepository;
     }
 
     public function createOrder($userId, $data)
     {
-        return $this->orderRepo->create([
+        return $this->orderRepository->create([
             'user_id' => $userId,
             'order_date' => now(),
             'status' => 'pending',
             'shipping_option' => $data['shipping_option'] ?? 'default',
-            'total' => $data['total_amount']
+            'total_amount' => $data['total_amount']
         ]);
     }
 
-public function updateOrderInfo($orderId, $data)
-{
-    return $this->orderRepo->update($orderId, [
-        'full_name' => $data['full_name'],
-        'phone' => $data['phone'],
-        'address' => $data['address'],
-        'province' => $data['province'],
-        'district' => $data['district'],
-        'ward' => $data['ward'],
-    ]);
-}
+    public function updateOrderInfo($orderId, $data)
+    {
+        return $this->orderRepository->update($orderId, [
+            'fullname' => $data['full_name'],
+            'phone' => $data['phone'],
+            'address' => $data['address'],
+            'province' => $data['province'],
+            'district' => $data['district'],
+            'ward' => $data['ward'],
+        ]);
+    }
 
+    public function getOrderConfirmationDetails($userId)
+    {
+        return $this->orderRepository->getLatestOrderByUser($userId);
+    }
+
+    public function confirmOrderAndSendMail($userId)
+    {
+        $orderData = $this->orderRepository->getLatestOrderByUser($userId);
+        $email = $orderData['customer']['email'];
+        $name = $orderData['customer']['fullname'];
+        $orderCode = $orderData['order_code'];
+
+        // Tạo PDF từ view 'invoice'
+        $pdf = Pdf::loadView('invoice', [
+            'orderCode' => $orderCode,
+            'customer' => $orderData['customer'],
+            'items' => $orderData['items'],
+            'summary' => $orderData['summary']
+        ]);
+
+        $filename = 'Invoice_' . Str::slug($orderCode) . '.pdf';
+        $pdfPath = storage_path('app/public/' . $filename);
+        $pdf->save($pdfPath);
+
+        // Tạo nội dung HTML email
+        $body = '
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Order Confirmation</title>
+            </head>
+            <body>
+                <h3>Hello ' . $name . ',</h3>
+
+                <p>Thank you very much for your recent order with us!</p>
+
+                <p>We’re excited to let you know that your order has been successfully processed.</p>
+
+                <p><strong>Order Code:</strong> ' . $orderCode . '</p>
+
+                <p>Please find your invoice attached to this email for your records. It includes the full details of your purchase.</p>
+
+                <p>If you have any questions or concerns regarding your order, feel free to reach out to our support team at any time. We are always happy to help!</p>
+
+                <p>Once again, thank you for choosing our store. We truly appreciate your business and hope to serve you again in the future.</p>
+
+                <p>Best regards,<br>
+                The ITDragons Team</p>
+            </body>
+            </html>
+        ';
+
+        // Gửi mail dùng MailerService
+        try {
+            $mailer = app(\App\Services\MailerService::class);
+            $mailer->send($email, 'Order Confirmation - ' . $orderCode, $body, $pdfPath);
+        } catch (\Exception $e) {
+            \Log::error('Send mail failed: ' . $e->getMessage());
+        }
+
+        // Xoá file PDF sau khi gửi
+        unlink($pdfPath);
+    }
 }

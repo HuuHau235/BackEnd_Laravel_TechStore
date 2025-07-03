@@ -24,12 +24,16 @@ class MailerService
         $this->mail->isHTML(true);
     }
 
-    public function send($to, $subject, $body)
+     public function send($to, $subject, $body, $attachmentPath = null)
     {
         try {
             $this->mail->addAddress($to);
             $this->mail->Subject = $subject;
             $this->mail->Body    = $body;
+
+            if ($attachmentPath) {
+                $this->mail->addAttachment($attachmentPath);
+            }
 
             $this->mail->send();
 
@@ -37,7 +41,7 @@ class MailerService
 
             return true;
         } catch (Exception $e) {
-            \Log::error('Mailer Error: ' . $e->getMessage()); 
+            \Log::error('Mailer Error: ' . $e->getMessage());
             return false;
         }
     }
