@@ -74,6 +74,8 @@ Route::middleware('auth:sanctum')->prefix('user')->group(function () {
     Route::post('/cart/apply-coupon', [ProductController::class, 'applyCoupon']);
     Route::post('/cart/checkout', [ProductController::class, 'checkout']);
     Route::post('/cart/add', [ProductController::class, 'addToCart']);
+    Route::get('/order/confirmation', [OrderController::class, 'getConfirmationDetails']);
+    Route::post('/order/confirm-payment', [OrderController::class, 'confirmPayment']);
 });
 
 Route::prefix('user')->group(function () {
@@ -97,8 +99,14 @@ Route::prefix('user')->group(function () {
 
     // Order
     Route::post('/orders/create', [OrderController::class, 'createOrder']);
-Route::put('/orders/{orderId}/update-info', [OrderController::class, 'updateOrderInfo']);
+    Route::put('/orders/{orderId}/update-info', [OrderController::class, 'updateOrderInfo']);
 
 });
+
+// Route::middleware('auth:sanctum')->group(function () {
+//     Route::get('/order/confirmation', [OrderController::class, 'getConfirmationDetails']);
+//     Route::post('/order/confirm-payment', [OrderController::class, 'confirmPayment']);
+// });
+
 
 
