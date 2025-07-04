@@ -64,7 +64,7 @@ class ProductService
     {
         return $this->productRepository->getValidCoupon($code);
     }
-    
+
     // public function processCheckout($request)
     // {
     //     $user = Auth::guard('user')->user();
@@ -135,81 +135,81 @@ class ProductService
     // }
 
     public function processCheckout($request)
-{
-    $user = Auth::guard('user')->user();
-    if (!$user) {
-        return response()->json(['message' => 'User not authenticated'], 401);
-    }
-    $userId = $user->id;
+    {
+        $user = Auth::guard('user')->user();
+        if (!$user) {
+            return response()->json(['message' => 'User not authenticated'], 401);
+        }
+        $userId = $user->id;
 
-    $items = $request->selected_items;
-    if (!is_array($items) || empty($items)) {
-        return response()->json(['message' => 'No items selected for checkout'], 400);
-    }
-
-    $shippingOption = $request->shipping_option;
-    $couponCode = $request->coupon_code;
-    $discount = $request->discount ?? 0;
-    $total = $request->total_amount;
-
-    DB::beginTransaction();
-
-    try {
-        $order = $this->productRepository->createOrder([
-            'user_id' => $userId,
-            'order_date' => now(),
-            'status' => 'pending',
-            'shipping_option' => $shippingOption,
-            'total_amount' => $total,
-            'coupon_code' => $couponCode,
-            'discount' => $discount,
-        ]);
-
-        $cartItemIdsToDelete = [];
-
-        foreach ($items as $item) {
-            $product = $this->productRepository->findProductById($item['product_id']);
-
-            if (!$product || $product->stock < $item['quantity']) {
-                DB::rollBack();
-                return response()->json([
-                    'message' => 'Sản phẩm "' . ($product->name ?? 'Không tồn tại') . '" đã hết hàng hoặc không đủ số lượng.',
-                    'product_id' => $item['product_id']
-                ], 400);
-            }
-
-            // Nếu sản phẩm hết hàng thì không cho tiến hành checkout
-            if ($product->stock == 0) {
-                DB::rollBack();
-                return response()->json([
-                    'message' => 'Sản phẩm "' . $product->name . '" đã hết hàng và không thể thanh toán.',
-                    'product_id' => $item['product_id']
-                ], 400);
-            }
-
-            $this->productRepository->createOrderDetail($order->id, $item);
-            $this->productRepository->decrementStock($item['product_id'], $item['quantity']);
-            $cartItemIdsToDelete[] = $item['cart_item_id'];
+        $items = $request->selected_items;
+        if (!is_array($items) || empty($items)) {
+            return response()->json(['message' => 'No items selected for checkout'], 400);
         }
 
-        // Xoá các sản phẩm đã thanh toán khỏi bảng product_cart
-        if (!empty($cartItemIdsToDelete)) {
-            $this->productRepository->deleteCartItems($userId, $cartItemIdsToDelete);
-        }
+        $shippingOption = $request->shipping_option;
+        $couponCode = $request->coupon_code;
+        $discount = $request->discount ?? 0;
+        $total = $request->total_amount;
 
-        DB::commit();
-        return response()->json([
-            'message' => 'Order placed successfully',
-            'order_id' => $order->id
-        ]);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json([
-            'message' => 'Failed to place order',
-            'error' => $e->getMessage()
-        ], 500);
+        DB::beginTransaction();
+
+        try {
+            $order = $this->productRepository->createOrder([
+                'user_id' => $userId,
+                'order_date' => now(),
+                'status' => 'pending',
+                'shipping_option' => $shippingOption,
+                'total_amount' => $total,
+                'coupon_code' => $couponCode,
+                'discount' => $discount,
+            ]);
+
+            $cartItemIdsToDelete = [];
+
+            foreach ($items as $item) {
+                $product = $this->productRepository->findProductById($item['product_id']);
+
+                if (!$product || $product->stock < $item['quantity']) {
+                    DB::rollBack();
+                    return response()->json([
+                        'message' => 'Sản phẩm "' . ($product->name ?? 'Không tồn tại') . '" đã hết hàng hoặc không đủ số lượng.',
+                        'product_id' => $item['product_id']
+                    ], 400);
+                }
+
+                // Nếu sản phẩm hết hàng thì không cho tiến hành checkout
+                if ($product->stock == 0) {
+                    DB::rollBack();
+                    return response()->json([
+                        'message' => 'Sản phẩm "' . $product->name . '" đã hết hàng và không thể thanh toán.',
+                        'product_id' => $item['product_id']
+                    ], 400);
+                }
+
+                $this->productRepository->createOrderDetail($order->id, $item);
+                $this->productRepository->decrementStock($item['product_id'], $item['quantity']);
+                $cartItemIdsToDelete[] = $item['cart_item_id'];
+            }
+
+            // Xoá các sản phẩm đã thanh toán khỏi bảng product_cart
+            if (!empty($cartItemIdsToDelete)) {
+                $this->productRepository->deleteCartItems($userId, $cartItemIdsToDelete);
+            }
+
+            DB::commit();
+            return response()->json([
+                'message' => 'Order placed successfully',
+                'order_id' => $order->id
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Failed to place order',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
-}
 
 
     public function addToCart($userId, $productId, $quantity)

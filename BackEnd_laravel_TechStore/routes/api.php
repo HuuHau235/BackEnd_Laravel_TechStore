@@ -1,9 +1,11 @@
 <?php
-
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\BlogContronller;
+use App\Http\Controllers\MoMoController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\VnPayController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -101,6 +103,12 @@ Route::prefix('user')->group(function () {
     Route::post('/orders/create', [OrderController::class, 'createOrder']);
     Route::put('/orders/{orderId}/update-info', [OrderController::class, 'updateOrderInfo']);
 
+    // VnPay
+    Route::post('/vnpay/create-payment', [VnPayController::class, 'createPayment'])->name('vnpay.create');
+    Route::get('/vnpay/return', [VnPayController::class, 'handleReturn'])->name('vnpay.return');
+    Route::post('/momo/create-payment', [MoMoController::class, 'momoPayment']);
+    Route::post('/payments', [PaymentController::class, 'store']);
+    Route::post('/orders/confirm-payment', [PaymentController::class, 'confirm']);
 });
 
 // Route::middleware('auth:sanctum')->group(function () {
