@@ -29,7 +29,7 @@ class OrderController extends Controller
         return response()->json(['message' => 'Order created', 'order_id' => $order->id]);
     }
 
-        // B2: Cập nhật thông tin người mua
+    // B2: Cập nhật thông tin người mua
     public function updateOrderInfo(Request $request, $orderId)
     {
         $validated = $request->validate([
@@ -61,7 +61,7 @@ class OrderController extends Controller
 
     public function confirmPayment()
     {
-       $user = Auth::guard('user')->user();
+        $user = Auth::guard('user')->user();
 
         if (!$user) {
             return response()->json(['message' => 'Not authenticated'], 401);
