@@ -4,8 +4,7 @@ namespace App\Services;
 
 use App\Models\Order;
 use App\Models\Payment;
-use App\Repositories\PaymentRepository;
-use Illuminate\Support\Carbon;
+use App\Repositories\PaymentRepository;use Illuminate\Support\Carbon;
 
 class PaymentService
 {
@@ -34,10 +33,10 @@ class PaymentService
     }
     public function confirmPayment($data)
     {
-        $payment = $this->paymentRepo->create([
-            'order_id' => $data['order_id'],
-            'method' => $data['method'],
-            'status' => 'Completed',
+       $payment = $this->paymentRepo->create([
+            'order_id'     => $data['order_id'],
+            'method'       => $data['method'],
+            'status'       => 'Completed',
             'payment_date' => Carbon::now(),
         ]);
 

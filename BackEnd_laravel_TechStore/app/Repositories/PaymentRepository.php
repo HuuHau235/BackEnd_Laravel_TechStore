@@ -10,5 +10,4 @@ class PaymentRepository
     {
         return Payment::create($data);
     }
-    
 }

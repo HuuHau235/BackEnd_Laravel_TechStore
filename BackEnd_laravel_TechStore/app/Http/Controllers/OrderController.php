@@ -46,4 +46,29 @@ class OrderController extends Controller
         return response()->json(['message' => 'Customer info updated successfully']);
     }
 
+    public function getConfirmationDetails()
+    {
+        $user = Auth::guard('user')->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Not authenticated'], 401);
+        }
+
+
+        $data = $this->orderService->getOrderConfirmationDetails($user->id);
+        return response()->json($data);
+    }
+
+    public function confirmPayment()
+    {
+        $user = Auth::guard('user')->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Not authenticated'], 401);
+        }
+
+        $this->orderService->confirmOrderAndSendMail($user->id);
+        return response()->json(['message' => 'Order confirmed and email sent successfully.']);
+    }
+
 }

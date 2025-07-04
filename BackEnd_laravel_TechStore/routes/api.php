@@ -76,6 +76,8 @@ Route::middleware('auth:sanctum')->prefix('user')->group(function () {
     Route::post('/cart/apply-coupon', [ProductController::class, 'applyCoupon']);
     Route::post('/cart/checkout', [ProductController::class, 'checkout']);
     Route::post('/cart/add', [ProductController::class, 'addToCart']);
+    Route::get('/order/confirmation', [OrderController::class, 'getConfirmationDetails']);
+    Route::post('/order/confirm-payment', [OrderController::class, 'confirmPayment']);
 });
 
 Route::prefix('user')->group(function () {
@@ -108,5 +110,7 @@ Route::prefix('user')->group(function () {
     Route::post('/payments', [PaymentController::class, 'store']);
     Route::post('/orders/confirm-payment', [PaymentController::class, 'confirm']);
 });
+
+
 
 
