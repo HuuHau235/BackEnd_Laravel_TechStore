@@ -69,11 +69,18 @@ class ProductRepository
             ->values();
     }
 
+    // public function getCartItemsByUser($userId)
+    // {
+    //     return ProductCart::with('product.firstImage')  /* lấy từ hàm firstImage bên trong Product model */
+    //     ->where('user_id', $userId)
+    //     ->get();
+    // }
+
     public function getCartItemsByUser($userId)
     {
-        return ProductCart::with('product.firstImage')  /* lấy từ hàm firstImage bên trong Product model */
-        ->where('user_id', $userId)
-        ->get();
+        return ProductCart::with(['product', 'product.firstImage']) // <-- thêm 'product' để có stock
+            ->where('user_id', $userId)
+            ->get();
     }
 
     public function findWithProduct($cartId)
@@ -128,6 +135,37 @@ class ProductRepository
     public function decrementStock($productId, $qty)
     {
         Product::where('id', $productId)->decrement('stock', $qty);
+    }
+
+    public function findProductById($productId)
+    {
+        return Product::find($productId);
+    }
+
+    public function addOrUpdateCart($userId, $productId, $quantity)
+    {
+        $cartItem = ProductCart::where('user_id', $userId)
+                    ->where('product_id', $productId)
+                    ->first();
+
+        if ($cartItem) {
+            $cartItem->quantity += $quantity;
+            $cartItem->save();
+            return $cartItem;
+        }
+
+        return ProductCart::create([
+            'user_id' => $userId,
+            'product_id' => $productId,
+            'quantity' => $quantity,
+        ]);
+    }
+
+    public function deleteCartItems($userId, array $cartItemIds)
+    {
+        return ProductCart::where('user_id', $userId)
+            ->whereIn('id', $cartItemIds)
+            ->delete();
     }
 
     public function getAllProductsWithImages()

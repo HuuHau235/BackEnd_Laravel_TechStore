@@ -13,6 +13,15 @@ class OrderFactory extends Factory
             'order_date' => now(),
             'status' => $this->faker->randomElement(['processing', 'completed', 'cancelled']),
             'total_amount' => $this->faker->randomFloat(2, 100, 5000),
+
+            // Thêm các trường mới
+            'full_name' => $this->faker->name(),
+            'phone' => $this->faker->phoneNumber(),
+            'address' => $this->faker->address(),
+            'province' => 'Đà Nẵng',
+            'district' => 'Hải Châu',
+            'ward' => 'Thạch Thang',
+
             'created_at' => now(),
         ];
     }

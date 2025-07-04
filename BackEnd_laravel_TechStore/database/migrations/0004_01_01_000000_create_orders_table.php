@@ -6,21 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateOrdersTable extends Migration
 {
+
     public function up()
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->timestamp('order_date');
-            $table->string('status')->comment('Order status: pending, processing, completed, cancelled');
+            $table->timestamp('order_date')->nullable();
+            $table->string('status')->default('pending')->comment('Order status: pending, processing, completed, cancelled');
             $table->decimal('total_amount', 10, 2);
 
-            // Thông tin người nhận hàng (không phụ thuộc vào tài khoản người dùng)
-            $table->string('receiver_name');
-            $table->string('receiver_phone');
-            $table->string('receiver_email')->nullable();
-            $table->string('shipping_address');
-            $table->string('note')->nullable();
+            // ✅ Thêm thông tin người nhận hàng ở đây:
+            $table->string('full_name')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('address')->nullable();
+            $table->string('province')->nullable();
+            $table->string('district')->nullable();
+            $table->string('ward')->nullable();
 
             $table->timestamps();
 
@@ -33,3 +35,4 @@ class CreateOrdersTable extends Migration
         Schema::dropIfExists('orders');
     }
 }
+
