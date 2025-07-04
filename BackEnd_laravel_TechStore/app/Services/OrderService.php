@@ -29,7 +29,7 @@ class OrderService
     public function updateOrderInfo($orderId, $data)
     {
         return $this->orderRepository->update($orderId, [
-            'fullname' => $data['full_name'],
+           'full_name' => $data['full_name'],
             'phone' => $data['phone'],
             'address' => $data['address'],
             'province' => $data['province'],
@@ -46,6 +46,7 @@ class OrderService
     public function confirmOrderAndSendMail($userId)
     {
         $orderData = $this->orderRepository->getLatestOrderByUser($userId);
+        
         $email = $orderData['customer']['email'];
         $name = $orderData['customer']['fullname'];
         $orderCode = $orderData['order_code'];
