@@ -30,20 +30,20 @@ class OrderController extends Controller
     }
 
     // B2: Cập nhật thông tin người mua
-  public function updateOrderInfo(Request $request, $orderId)
-{
-    $validated = $request->validate([
-        'full_name' => 'required|string|max:255',
-        'phone' => 'required|string|max:20',
-        'address' => 'required|string|max:255',
-        'province' => 'required|string|max:255',
-        'district' => 'required|string|max:255',
-        'ward' => 'required|string|max:255',
-    ]);
+    public function updateOrderInfo(Request $request, $orderId)
+    {
+        $validated = $request->validate([
+            'full_name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string|max:255',
+            'province' => 'required|string|max:255',
+            'district' => 'required|string|max:255',
+            'ward' => 'required|string|max:255',
+        ]);
 
-    $this->orderService->updateOrderInfo($orderId, $validated);
+        $this->orderService->updateOrderInfo($orderId, $validated);
 
-    return response()->json(['message' => 'Customer info updated successfully']);
-}
+        return response()->json(['message' => 'Customer info updated successfully']);
+    }
 
 }
