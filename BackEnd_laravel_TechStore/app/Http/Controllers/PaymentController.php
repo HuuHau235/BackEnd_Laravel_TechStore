@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\PaymentService;
 
@@ -14,7 +15,22 @@ class PaymentController extends Controller
         $this->paymentService = $paymentService;
     }
 
-    public function confirm(Request $request)
+    public function store(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'payment_method' => 'required|string|in:momo,cash,vnpay,qr',
+            'amount' => 'required|numeric|min:0',
+        ]);
+
+        $payment = $this->paymentService->createPayment($request->all());
+
+        return response()->json([
+            'message' => 'Lưu phương thức thanh toán thành công!',
+            'data' => $payment,
+        ]);
+    }
+     public function confirm(Request $request)
     {
         $validated = $request->validate([
             'order_id' => 'required|exists:orders,id',
