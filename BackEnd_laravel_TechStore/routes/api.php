@@ -10,6 +10,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ProductSpecificationController;
+use App\Http\Controllers\ProductDescriptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -98,6 +101,9 @@ Route::prefix('user')->group(function () {
     Route::get('/product/index', [ProductController::class, 'index']);
     Route::get('/product/promoted', [ProductController::class, 'getPromotedProducts']);
     Route::get('/product/categories', [ProductController::class, 'getProductCategories']);
+    Route::get('/reviews/product/{productId}', [ReviewController::class, 'getReviewsByProduct']);
+    Route::get('/specification/product/{productId}', [ProductSpecificationController::class, 'getByProductId']);
+    Route::get('/description/product/{productId}', [ProductDescriptionController::class, 'getByProductId']);
 
     // Order
     Route::post('/orders/create', [OrderController::class, 'createOrder']);
