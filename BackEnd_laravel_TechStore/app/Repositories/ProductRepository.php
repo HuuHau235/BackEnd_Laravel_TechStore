@@ -1,9 +1,10 @@
 <?php
 
 namespace App\Repositories;
-
+use Illuminate\Support\Facades\DB;
 use App\Models\Product;
 use App\Models\ProductCart;
+use App\Models\ProductFavorite;
 use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -179,5 +180,116 @@ class ProductRepository
             ->orderBy('created_at', 'desc') 
             ->take(5)
             ->get();
+    }
+
+    public function getProductWithImagesAndColors(int $productId)
+    {
+        $product = Product::with(['images', 'colors'])->findOrFail($productId);
+        return [
+            'id' => $product->id,
+            'name' => $product->name,
+            'price' => $product->price,
+            'old_price' => $product->old_price,
+            'stock' => $product->stock,
+            'colors' => $product->colors->pluck('color'),
+            'images' => $product->images->take(4)->pluck('image_url'),
+            'category_id' => $product->category_id,
+        ];
+    }
+
+    // public function getProductsInSameCategory(int $productId)
+    // {
+    //     $categoryId = Product::findOrFail($productId)->category_id;
+    //     return Product::where('category_id', $categoryId)
+    //                   ->where('id', '!=', $productId)
+    //                   ->take(6)
+    //                   ->get(['id', 'name', 'price', 'old_price'])
+    //                   ->map(fn ($product) => [
+    //                       'id' => $product->id,
+    //                       'name' => $product->name,
+    //                       'price' => $product->price,
+    //                       'old_price' => $product->old_price,
+    //                       'image' => $product->images()->first()?->image_url
+    //                   ]);
+    // }
+
+    public function find($productId)
+    {
+        return Product::findOrFail($productId);
+    }
+
+    public function getRelatedProducts($categoryId, $excludeProductId)
+    {
+        return Product::with(['firstImage', 'reviews'])
+            ->where('category_id', $categoryId)
+            ->where('id', '!=', $excludeProductId)
+            ->take(6)
+            ->get()
+            ->map(function ($product) {
+                $avgRating = $product->reviews->avg('rating');
+
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'price' => $product->price,
+                    'old_price' => $product->old_price,
+                    'promotion_type' => $product->promotion_type,
+                    'image' => $product->firstImage ? $product->firstImage->image_url : null,
+                    'rating' => round($avgRating, 1),
+                ];
+            });
+    }
+
+
+    public function addToCart(int $userId, int $productId, int $quantity, ?string $color)
+    {
+        return ProductCart::updateOrCreate(
+            ['user_id' => $userId, 'product_id' => $productId],
+            ['quantity' => $quantity, 'color' => $color]
+        );
+    }
+
+    public function addToWishlist(int $userId, int $productId)
+    {
+        return ProductFavorite::firstOrCreate([
+            'user_id' => $userId,
+            'product_id' => $productId,
+        ]);
+    }
+
+    public function createOrderImmediately(int $userId, int $productId, int $quantity, ?string $color)
+    {
+        return DB::transaction(function () use ($userId, $productId, $quantity, $color) {
+            $product = Product::findOrFail($productId);
+
+            $order = Order::create([
+                'user_id' => $userId,
+                'order_date' => now(),
+                'status' => 'pending',
+                'shipping_option' => 'free',
+                'total_amount' => $product->price * $quantity,
+                'coupon_code' => null,
+                'discount' => 0.00,
+                'fullname' => null,
+                'phone' => null,
+                'address' => null,
+                'province' => null,
+                'district' => null,
+                'ward' => null,
+            ]);
+
+            OrderDetail::create([
+                'order_id' => $order->id,
+                'product_id' => $productId,
+                'quantity' => $quantity,
+                'unit_price' => $product->price,
+                'color' => $color,
+            ]);
+
+            return [
+                'message' => 'Buy Now order created successfully',
+                'order_id' => $order->id,
+            ];
+        });
     }
 }

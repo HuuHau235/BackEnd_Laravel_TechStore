@@ -167,4 +167,30 @@ class ProductService
     {
         return $this->productRepository->getTopFiveProducts();
     }
+
+    public function getProductDetailById(int $productId) {
+        return $this->productRepository->getProductWithImagesAndColors($productId);
+    }
+
+    public function getProductById($productId)
+    {
+        return $this->productRepository->find($productId);
+    }
+    
+    public function getRelatedProductsByCategory($categoryId, $excludeProductId)
+    {
+        return $this->productRepository->getRelatedProducts($categoryId, $excludeProductId);
+    }
+
+    public function addProductToCart(int $userId, int $productId, int $quantity, ?string $color) {
+        return $this->productRepository->addToCart($userId, $productId, $quantity, $color);
+    }
+
+    public function addProductToWishlist(int $userId, int $productId) {
+        return $this->productRepository->addToWishlist($userId, $productId);
+    }
+
+    public function processBuyNow(int $userId, int $productId, int $quantity, ?string $color) {
+        return $this->productRepository->createOrderImmediately($userId, $productId, $quantity, $color);
+    }
 }

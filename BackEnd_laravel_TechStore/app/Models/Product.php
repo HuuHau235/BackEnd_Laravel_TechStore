@@ -46,4 +46,10 @@ class Product extends Model
     {
         return $this->hasOne(ProductImage::class, 'product_id')->oldest();
     }
+
+    public function colors()
+    {
+        return $this->hasMany(ProductColor::class, 'product_id');
+    }
 }
+
