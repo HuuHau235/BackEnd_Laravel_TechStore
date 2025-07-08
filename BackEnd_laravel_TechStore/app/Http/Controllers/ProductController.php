@@ -143,37 +143,6 @@ class ProductController extends Controller
         return $this->productService->processCheckout($request);
 
     }
-
-    // public function addToCart(Request $request)
-    // {
-    //     try {
-    //         $request->validate([
-    //             'product_id' => 'required|exists:products,id',
-    //             'quantity' => 'required|integer|min:1'
-    //         ]);
-
-    //         $user = Auth::guard('user')->user();
-    //         if (!$user) {
-    //             return response()->json(['message' => 'User not authenticated'], 401);
-    //         }
-
-    //         $cartItem = $this->productService->addToCart(
-    //             $user->id,
-    //             $request->product_id,
-    //             $request->quantity
-    //         );
-
-    //         return response()->json([
-    //             'message' => 'Product added to cart successfully.',
-    //             'data' => $cartItem
-    //         ]);
-    //     } catch (\Illuminate\Validation\ValidationException $e) {
-    //         return response()->json(['errors' => $e->errors()], 422);
-    //     } catch (\Exception $e) {
-    //         return response()->json(['error' => $e->getMessage()], 500);
-    //     }
-    // }
-
     public function addToCart(Request $request)
     {
         try {
@@ -259,4 +228,29 @@ class ProductController extends Controller
 
         return response()->json($products);
     }
+
+    // Xem chi tiết sản phẩm
+    public function show($id): JsonResponse
+{
+    try {
+        $product = $this->productService->getProductById($id);
+
+        return response()->json([
+            'status' => true,
+            'data' => $product,
+        ]);
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Product not found',
+        ], 404);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Error fetching product detail',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
 }

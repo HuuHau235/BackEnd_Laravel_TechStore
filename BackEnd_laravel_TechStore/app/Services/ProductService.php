@@ -166,4 +166,10 @@ class ProductService
     {
         return $this->productRepository->getTopFiveProducts();
     }
+
+    // Xem chi tiết
+     public function getProductById($id)
+    {
+        return $this->productRepository->findByIdWithRelations($id);
+    }
 }

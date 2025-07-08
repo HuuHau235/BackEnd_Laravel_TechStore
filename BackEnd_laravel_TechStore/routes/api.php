@@ -104,7 +104,7 @@ Route::prefix('user')->group(function () {
     Route::get('/reviews/product/{productId}', [ReviewController::class, 'getReviewsByProduct']);
     Route::get('/specification/product/{productId}', [ProductSpecificationController::class, 'getByProductId']);
     Route::get('/description/product/{productId}', [ProductDescriptionController::class, 'getByProductId']);
-
+    Route::get('/products/{id}', [ProductController::class, 'show']);
     // Order
     Route::post('/orders/create', [OrderController::class, 'createOrder']);
     Route::put('/orders/{orderId}/update-info', [OrderController::class, 'updateOrderInfo']);

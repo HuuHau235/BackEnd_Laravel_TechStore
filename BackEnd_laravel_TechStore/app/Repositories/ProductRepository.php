@@ -180,4 +180,11 @@ class ProductRepository
             ->take(5)
             ->get();
     }
+
+    // Xem chi tiết 
+     public function findByIdWithRelations($id)
+    {
+        return Product::with(['images', 'category']) 
+            ->findOrFail($id);
+    }
 }
