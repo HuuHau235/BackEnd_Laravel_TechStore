@@ -64,8 +64,6 @@ class ProductService
     {
         return $this->productRepository->getValidCoupon($code);
     }
-<<<<<<< HEAD
-=======
 
     // public function processCheckout($request)
     // {
@@ -135,7 +133,6 @@ class ProductService
     //         ], 500);
     //     }
     // }
->>>>>>> bb78eb9e3ab2aa96b6eda5c9eb707a901967165f
 
     public function processCheckout($request)
     {
