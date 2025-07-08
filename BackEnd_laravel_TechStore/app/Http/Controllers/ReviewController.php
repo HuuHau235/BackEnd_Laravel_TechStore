@@ -26,126 +26,49 @@ class ReviewController extends Controller
             'data' => $reviews
         ]);
     }
-
-    // public function storeReview(Request $request, $productId)
-    // {
-    //     $validated = $request->validate([
-    //         'rating' => 'required|integer|min:1|max:5',
-    //         'comment' => 'nullable|string',
-    //         'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-    //     ]);
-
-    //     $user = Auth::guard('user')->user();
-    //     if (!$user) {
-    //         return response()->json(['message' => 'User not authenticated'], 401);
-    //     }
-
-    //     // Gọi Service xử lý tạo review
-    //     $this->reviewService->createReview($user->id, $productId, $validated);
-
-    //     return response()->json(['message' => 'Review submitted successfully.'], 201);
-    // }
-
-    // public function storeReview(Request $request, $productId)
-    // {
-    //     $validated = $request->validate([
-    //         'rating' => 'required|integer|min:1|max:5',
-    //         'comment' => 'nullable|string',
-    //         'file' => 'nullable|file|image|max:5120',
-    //     ]);
-
-    //     $user = Auth::guard('user')->user();
-    //     if (!$user) {
-    //         return response()->json(['message' => 'User not authenticated'], 401);
-    //     }
-
-    //     // Xử lý upload ảnh tại đây (nếu có)
-    //     $filePath = null;
-    //     if ($request->hasFile('file') && $request->file('image')->isValid()) {
-    //         $uploadedFile = Cloudinary::upload($request->file('image')->getRealPath(), [
-    //             'folder' => 'Reviews',
-    //         ]);
-    //         $imageUrl = $uploadedFile->getSecurePath();
-    //     }
-
-    //     // Gọi Service (chỉ xử lý dữ liệu)
-    //     $this->reviewService->createReview($user->id, $productId, [
-    //         'rating' => $validated['rating'],
-    //         'comment' => $validated['comment'] ?? '',
-    //         'image_url' => $imageUrl,
-    //     ]);
-
-    //     return response()->json(['message' => 'Review submitted successfully.'], 201);
-    // }
-
-    // public function storeReview(Request $request, $productId)
-    // {
-    //     $validated = $request->validate([
-    //         'rating' => 'required|integer|min:1|max:5',
-    //         'comment' => 'nullable|string',
-    //         'file' => 'nullable|file|image|max:5120',
-    //     ]);
-
-    //     $user = Auth::guard('user')->user();
-    //     if (!$user) {
-    //         return response()->json(['message' => 'User not authenticated'], 401);
-    //     }
-
-    //     // Upload ảnh nếu có
-    //     $imageUrl = null;
-    //     if ($request->hasFile('file') && $request->file('file')->isValid()) {
-    //         $uploadedFile = Cloudinary::upload($request->file('file')->getRealPath(), [
-    //             'folder' => 'Reviews',
-    //         ]);
-    //         $imageUrl = $uploadedFile->getSecurePath();
-    //     }
-
-    //     // Gọi service xử lý lưu review
-    //     $this->reviewService->createReview($user->id, $productId, [
-    //         'rating' => $validated['rating'],
-    //         'comment' => $validated['comment'] ?? '',
-    //         'image_url' => $imageUrl,
-    //     ]);
-
-    //     return response()->json(['message' => 'Review submitted successfully.'], 201);
-    // }
-
+    
     public function storeReview(Request $request, $productId)
-{
-    $validated = $request->validate([
-        'rating' => 'required|integer|min:1|max:5',
-        'comment' => 'nullable|string',
-        'file' => 'nullable|file|image|max:5120',
-    ]);
+    {
+        $validated = $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string',
+            'file' => 'nullable|file|image|max:5120',
+        ]);
 
-    $user = Auth::guard('user')->user();
-    if (!$user) {
-        return response()->json(['message' => 'User not authenticated'], 401);
-    }
-
-    // Upload ảnh nếu có
-    $imageUrl = null;
-    if ($request->hasFile('file') && $request->file('file')->isValid()) {
-        try {
-            $uploadedFile = Cloudinary::upload($request->file('file')->getRealPath(), [
-                'folder' => 'Reviews',
-                'upload_preset' => env('CLOUDINARY_UPLOAD_PRESET', 'techstore'),
-            ]);
-            $imageUrl = $uploadedFile->getSecurePath();
-        } catch (\Exception $e) {
-            \Log::error('Cloudinary upload failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Không thể tải ảnh lên Cloudinary'], 500);
+        $user = Auth::guard('user')->user();
+        if (!$user) {
+            return response()->json(['message' => 'User not authenticated'], 401);
         }
-    }
 
-    // Gọi service xử lý lưu review
-    $this->reviewService->createReview($user->id, $productId, [
-        'rating' => $validated['rating'],
-        'comment' => $validated['comment'] ?? '',
-        'image_url' => $imageUrl,
-    ]);
+        // Upload ảnh nếu có
+        $imageUrl = null;
+        if ($request->hasFile('file') && $request->file('file')->isValid()) {
+            try {
+                $uploadResult = Cloudinary::uploadApi()->upload($request->file('file')->getRealPath(), [
+                    'folder' => 'Reviews',
+                ]);
+                $imageUrl = $uploadResult['secure_url'];
+            } catch (\Exception $e) {
+                \Log::error('Cloudinary upload failed: ' . $e->getMessage(), [
+                    'exception' => $e->getTraceAsString(),
+                    'config' => config('cloudinary'),
+                    'env_values' => [
+                        'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                        'api_key' => env('CLOUDINARY_API_KEY'),
+                        'api_secret' => env('CLOUDINARY_API_SECRET'),
+                    ]
+                ]);
+                return response()->json(['error' => 'Không thể tải ảnh lên Cloudinary'], 500);
+            }
+        }
 
-    return response()->json(['message' => 'Đánh giá đã được gửi thành công.'], 201);
-}
+        // Gọi service xử lý lưu review
+        $this->reviewService->createReview($user->id, $productId, [
+            'rating' => $validated['rating'],
+            'comment' => $validated['comment'] ?? '',
+            'image_url' => $imageUrl,
+        ]);
 
+        return response()->json(['message' => 'Đánh giá đã được gửi thành công.'], 201);
+    } 
 }
