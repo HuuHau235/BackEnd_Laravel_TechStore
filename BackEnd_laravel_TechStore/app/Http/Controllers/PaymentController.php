@@ -26,7 +26,7 @@ class PaymentController extends Controller
         $payment = $this->paymentService->createPayment($request->all());
 
         return response()->json([
-            'message' => 'Lưu phương thức thanh toán thành công!',
+            'message' => 'Payment method was stored successfully!',
             'data' => $payment,
         ]);
     }
@@ -40,7 +40,7 @@ class PaymentController extends Controller
         $result = $this->paymentService->confirmPayment($validated);
 
         return response()->json([
-            'message' => 'Xác nhận thanh toán thành công.',
+            'message' => 'Payment confirmation successful.',
             'payment_id' => $result->id,
         ]);
     }

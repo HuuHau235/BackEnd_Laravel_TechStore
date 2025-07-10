@@ -15,6 +15,7 @@ class ProductCart extends Model
         'product_id',
         'user_id',
         'quantity',
+        'color',
     ];
 
     public function product()

@@ -20,7 +20,7 @@ class VnPayController extends Controller
         }
 
         $vnp_TxnRef = uniqid();
-        $vnp_OrderInfo = 'Thanh toán đơn hàng #' . $vnp_TxnRef;
+        $vnp_OrderInfo = 'Payment for Order #' . $vnp_TxnRef;
 
         $vnp_Amount = (int)$data['amount']; // ✅ KHÔNG nhân *100 nữa
         $vnp_IpAddr = $request->ip();
