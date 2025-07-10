@@ -7,6 +7,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use App\Exceptions\OutOfStockException;
 
 class ProductController extends Controller
 {
@@ -143,6 +144,7 @@ class ProductController extends Controller
         return $this->productService->processCheckout($request);
 
     }
+
     public function addToCart(Request $request)
     {
         try {
@@ -229,28 +231,125 @@ class ProductController extends Controller
         return response()->json($products);
     }
 
-    // Xem chi tiết sản phẩm
-    public function show($id): JsonResponse
-{
-    try {
-        $product = $this->productService->getProductById($id);
-
-        return response()->json([
-            'status' => true,
-            'data' => $product,
-        ]);
-    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Product not found',
-        ], 404);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Error fetching product detail',
-            'error' => $e->getMessage(),
-        ], 500);
+    public function getProductDetail($productId) {
+        return response()->json($this->productService->getProductDetailById($productId));
     }
-}
 
+    public function getRelatedProducts($productId)
+    {
+        try {
+            $product = $this->productService->getProductById($productId);
+            $relatedProducts = $this->productService->getRelatedProductsByCategory($product->category_id, $productId);
+
+            return response()->json([
+                'success' => true,
+                'data' => $relatedProducts
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function add_to_cart(Request $request)
+    {
+        try {
+            $request->validate([
+                'product_id' => 'required|integer|exists:products,id',
+                'quantity'   => 'required|integer|min:1',
+                'color'      => 'nullable|string'
+            ]);
+
+            $userId = auth()->id();
+            if (!$userId) {
+                return response()->json(['message' => 'User not authenticated'], 401);
+            }
+
+            $cartItem = $this->productService->addProductToCart(
+                $userId,
+                $request->product_id,
+                $request->quantity,
+                $request->color
+            );
+
+            return response()->json([
+                'message' => 'Product added to cart successfully.',
+                'data'    => $cartItem
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (OutOfStockException $e) {
+            return response()->json([
+                'message'  => $e->getMessage(),
+                'stock'    => $e->stock,
+                'in_cart'  => $e->inCart,
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function add_to_wishlist(Request $request) {
+        $request->validate([
+            'product_id' => 'required|integer|exists:products,id',
+            'color'      => 'nullable|string'
+        ]);
+        return response()->json(
+            $this->productService->addProductToWishlist(
+                auth()->id(),
+                $request->product_id,
+                $request->color
+            )
+        );
+    }
+
+    public function removeFromWishlist(Request $request)
+    {
+        $user = auth()->guard('user')->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $validated = $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'color' => 'nullable|string',
+        ]);
+
+        $this->productService->removeFromWishlist($user->id, $validated['product_id'], $validated['color'] ?? null);
+
+        return response()->json(['message' => 'Removed from wishlist successfully.']);
+    }
+
+    public function buyNow(Request $request)
+    {
+        try {
+            $request->validate([
+                'product_id' => 'required|exists:products,id',
+                'quantity' => 'required|integer|min:1',
+                'color' => 'nullable|string',
+            ]);
+
+            $userId = auth()->id();
+            if (!$userId) {
+                return response()->json(['message' => 'Unauthorized'], 401);
+            }
+
+            $order = $this->productService->processBuyNow(
+                $userId,
+                $request->product_id,
+                $request->quantity,
+                $request->color
+            );
+
+            return response()->json([
+                'message' => 'Buy now successful.',
+                'data' => $order
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
 }

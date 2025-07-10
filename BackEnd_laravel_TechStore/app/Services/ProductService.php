@@ -5,6 +5,9 @@ namespace App\Services;
 use App\Repositories\ProductRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\Product;
+use App\Models\ProductCart;
+use App\Exceptions\OutOfStockException;
 
 class ProductService
 {
@@ -64,6 +67,7 @@ class ProductService
     {
         return $this->productRepository->getValidCoupon($code);
     }
+
     public function processCheckout($request)
     {
         $user = Auth::guard('user')->user();
@@ -103,7 +107,7 @@ class ProductService
                 if (!$product || $product->stock < $item['quantity']) {
                     DB::rollBack();
                     return response()->json([
-                        'message' => 'Sản phẩm "' . ($product->name ?? 'Không tồn tại') . '" đã hết hàng hoặc không đủ số lượng.',
+                        'message' => 'The product "' . ($product->name ?? 'Not available') . '" is out of stock or does not have sufficient quantity.',
                         'product_id' => $item['product_id']
                     ], 400);
                 }
@@ -112,7 +116,7 @@ class ProductService
                 if ($product->stock == 0) {
                     DB::rollBack();
                     return response()->json([
-                        'message' => 'Sản phẩm "' . $product->name . '" đã hết hàng và không thể thanh toán.',
+                        'message' => 'The product "' . $product->name . '" is out of stock and cannot be purchased.',
                         'product_id' => $item['product_id']
                     ], 400);
                 }
@@ -142,6 +146,21 @@ class ProductService
     }
 
 
+    // public function addToCart($userId, $productId, $quantity)
+    // {
+    //     $product = $this->productRepository->findProductById($productId);
+
+    //     if (!$product) {
+    //         throw new \Exception('Product not found.');
+    //     }
+
+    //     if ($quantity > $product->stock) {
+    //         throw new \Exception('Requested quantity exceeds available stock.');
+    //     }
+
+    //     return $this->productRepository->addOrUpdateCart($userId, $productId, $quantity);
+    // }
+
     public function addToCart($userId, $productId, $quantity)
     {
         $product = $this->productRepository->findProductById($productId);
@@ -150,12 +169,22 @@ class ProductService
             throw new \Exception('Product not found.');
         }
 
-        if ($quantity > $product->stock) {
-            throw new \Exception('Requested quantity exceeds available stock.');
+        // 🔍 Lấy số lượng đã có trong giỏ hàng
+        $existingCartItem = $this->productRepository->getCartItem($userId, $productId);
+        $alreadyInCart = $existingCartItem ? $existingCartItem->quantity : 0;
+
+        // 🔢 Tổng số lượng sau khi thêm
+        $totalQuantity = $alreadyInCart + $quantity;
+
+        // ❌ Nếu vượt quá tồn kho
+        if ($totalQuantity > $product->stock) {
+            throw new \Exception("Requested quantity exceeds available stock.");
         }
 
+        // ✅ Cho phép thêm
         return $this->productRepository->addOrUpdateCart($userId, $productId, $quantity);
     }
+
 
     public function getAllProductsWithImages()
     {
@@ -167,9 +196,86 @@ class ProductService
         return $this->productRepository->getTopFiveProducts();
     }
 
-    // Xem chi tiết
-     public function getProductById($id)
+
+    public function getProductDetailById(int $productId)
     {
-        return $this->productRepository->findByIdWithRelations($id);
+        return $this->productRepository->getProductWithImagesAndColors($productId);
+    }
+
+    public function getProductById($productId)
+    {
+        return $this->productRepository->find($productId);
+    }
+
+    public function getRelatedProductsByCategory($categoryId, $excludeProductId)
+    {
+        return $this->productRepository->getRelatedProducts($categoryId, $excludeProductId);
+    }
+
+    public function addProductToCart(int $userId, int $productId, int $quantity, ?string $color)
+    {
+        // 1. Tìm sản phẩm
+        $product = Product::find($productId);
+        if (!$product) {
+            throw new \Exception('Product not found');
+        }
+
+        // 2. Tính tổng số lượng đã có trong cart (mọi màu)
+        $cartItemsSameProduct = ProductCart::where('user_id', $userId)
+            ->where('product_id', $productId)
+            ->get();
+
+        $alreadyInCart = $cartItemsSameProduct->sum('quantity');
+        $totalQuantity = $alreadyInCart + $quantity;
+
+        // 3. Nếu vượt stock => báo lỗi
+        if ($totalQuantity > $product->stock) {
+            throw new OutOfStockException(
+                'Requested quantity exceeds available stock',
+                $product->stock,
+                $alreadyInCart
+            );
+        }
+
+        // 4. Nếu hợp lệ, cập nhật riêng theo màu
+        return $this->productRepository->addToCart($userId, $productId, $quantity, $color);
+    }
+
+    public function addProductToWishlist(int $userId, int $productId, ?string $color)
+    {
+        return $this->productRepository->addToWishlist($userId, $productId, $color);
+    }
+
+    public function removeFromWishlist(int $userId, int $productId, ?string $color)
+    {
+        return $this->productRepository->removeFromWishlist($userId, $productId, $color);
+    }
+
+    // public function processBuyNow(int $userId, int $productId, int $quantity, ?string $color) {
+    //     return $this->productRepository->createOrderImmediately($userId, $productId, $quantity, $color);
+    // }
+
+    public function processBuyNow(int $userId, int $productId, int $quantity, ?string $color)
+    {
+        $product = $this->productRepository->findProductById($productId);
+
+        if (!$product) {
+            throw new \Exception('Product not found.');
+        }
+
+        if ($product->stock <= 0) {
+            throw new \Exception('The product is out of stock.');
+        }
+
+        if ($quantity > $product->stock) {
+            throw new \Exception("Only {$product->stock} item(s) left in stock.");
+        }
+
+        // Trừ tồn kho
+        $product->stock -= $quantity;
+        $product->save();
+
+        // Gọi Repository để tạo đơn hàng tạm thời
+        return $this->productRepository->createOrderImmediately($userId, $productId, $quantity, $color);
     }
 }
