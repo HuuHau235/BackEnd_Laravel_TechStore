@@ -215,5 +215,7 @@ return [
 
     'Socialite' => Laravel\Socialite\Facades\Socialite::class,
 
+    CloudinaryLabs\CloudinaryLaravel\CloudinaryServiceProvider::class
+
 ];
 
