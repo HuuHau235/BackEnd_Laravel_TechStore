@@ -191,22 +191,6 @@ class ProductRepository
         ];
     }
 
-    // public function getProductsInSameCategory(int $productId)
-    // {
-    //     $categoryId = Product::findOrFail($productId)->category_id;
-    //     return Product::where('category_id', $categoryId)
-    //                   ->where('id', '!=', $productId)
-    //                   ->take(6)
-    //                   ->get(['id', 'name', 'price', 'old_price'])
-    //                   ->map(fn ($product) => [
-    //                       'id' => $product->id,
-    //                       'name' => $product->name,
-    //                       'price' => $product->price,
-    //                       'old_price' => $product->old_price,
-    //                       'image' => $product->images()->first()?->image_url
-    //                   ]);
-    // }
-
     public function find($productId)
     {
         return Product::findOrFail($productId);
@@ -309,4 +293,15 @@ class ProductRepository
             ];
         });
     }
+
+    public function getCartItem(int $userId, int $productId, ?string $color = null)
+{
+    return ProductCart::where('user_id', $userId)
+        ->where('product_id', $productId)
+        ->when($color, function ($query) use ($color) {
+            return $query->where('color', $color);
+        })
+        ->first();
+}
+
 }
