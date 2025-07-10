@@ -14,6 +14,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ProductSpecificationController;
 use App\Http\Controllers\ProductDescriptionController;
+use App\Http\Controllers\ProductFavoriteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -114,6 +115,13 @@ Route::prefix('user')->group(function () {
     Route::get('/product/index', [ProductController::class, 'index']);
     Route::get('/product/promoted', [ProductController::class, 'getPromotedProducts']);
     Route::get('/product/categories', [ProductController::class, 'getProductCategories']);
+    // Route::get('/reviews/product/{productId}', [ReviewController::class, 'getReviewsByProduct']);
+    // Route::get('/specification/product/{productId}', [ProductSpecificationController::class, 'getByProductId']);
+    // Route::get('/description/product/{productId}', [ProductDescriptionController::class, 'getByProductId']);
+    Route::get('/wishlist/{id}', [ProductFavoriteController::class, 'getUserFavorites']);
+    Route::delete('/delete/wishlist/{id}', [ProductFavoriteController::class, 'destroy']);
+    Route::post('/wishlist/add', [ProductFavoriteController::class, 'add']);
+
 
     // Order
     Route::post('/orders/create', [OrderController::class, 'createOrder']);
@@ -125,6 +133,8 @@ Route::prefix('user')->group(function () {
     Route::post('/momo/create-payment', [MoMoController::class, 'momoPayment']);
     Route::post('/payments', [PaymentController::class, 'store']);
     Route::post('/orders/confirm-payment', [PaymentController::class, 'confirm']);
+    Route::post('/orders/create', [OrderController::class, 'create']);
+    Route::get('/orders/{order}', [OrderController::class, 'show']);
 });
 
 

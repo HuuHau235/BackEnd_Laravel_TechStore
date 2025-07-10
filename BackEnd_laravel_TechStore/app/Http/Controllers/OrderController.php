@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\OrderService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use App\Models\Order;
+use App\Models\OrderDetail;
+
 
 class OrderController extends Controller
 {
@@ -70,5 +74,80 @@ class OrderController extends Controller
         $this->orderService->confirmOrderAndSendMail($user->id);
         return response()->json(['message' => 'Order confirmed and email sent successfully.']);
     }
+public function create(Request $request)
+{
+    $request->validate([
+        'products' => 'required|array',
+        'products.*.product_id' => 'required|exists:products,id',
+        'products.*.quantity' => 'required|integer|min:1',
+        'products.*.unit_price' => 'required|numeric|min:0',
+    ]);
 
+    try {
+        DB::beginTransaction();
+
+        $userId = Auth::guard('user')->id(); // Lấy user từ token
+
+        if (!$userId) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $total = collect($request->products)->sum(function ($item) {
+            return $item['quantity'] * $item['unit_price'];
+        });
+
+        $order = Order::create([
+            'user_id' => $userId,
+            'order_date' => now(),
+            'status' => 'pending',
+            'shipping_option' => "free",
+            'total_amount' => $total,
+            'coupon_code' => null,
+            'discount' => 0,
+        ]);
+
+        foreach ($request->products as $product) {
+            OrderDetail::create([
+                'order_id' => $order->id,
+                'product_id' => $product['product_id'],
+                'quantity' => $product['quantity'],
+                'unit_price' => $product['unit_price'],
+            ]);
+        }
+
+        DB::commit();
+
+        return response()->json([
+            'message' => 'Order created successfully.',
+            'order_id' => $order->id,
+        ]);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+
+public function show($orderId)
+{
+    $order = Order::with(['orderDetails.product.images'])->findOrFail($orderId);
+
+    return response()->json([
+        'order' => [
+            'id' => $order->id,
+            'user_id' => $order->user_id,
+            'order_date' => $order->order_date,
+            'status' => $order->status,
+            'total_amount' => $order->total_amount,
+            'order_details' => $order->orderDetails->map(function ($detail) {
+                return [
+                    'product_id' => $detail->product->id,
+                    'name' => $detail->product->name,
+                    'unit_price' => $detail->unit_price,
+                    'quantity' => $detail->quantity,
+                    'image' => $detail->product->images->first()->image_url ?? null,
+                ];
+            }),
+        ]
+    ]);
+}
 }
