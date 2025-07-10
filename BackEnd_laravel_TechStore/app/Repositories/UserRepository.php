@@ -46,4 +46,8 @@ class UserRepository
 
         return $user->avatar; 
     }
+    public function getAllUsers()
+    {
+        return User::select('id','name', 'email', 'role', 'address', 'phone')->get();
+    }
 }

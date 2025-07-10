@@ -15,6 +15,8 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ProductSpecificationController;
 use App\Http\Controllers\ProductDescriptionController;
 use App\Http\Controllers\ProductFavoriteController;
+use App\Http\Controllers\Admin\AdminUserController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +24,11 @@ use App\Http\Controllers\ProductFavoriteController;
 |--------------------------------------------------------------------------
 | Tất cả route ở đây được tự động gắn prefix là /api
 */
+Route::prefix('admin')->group(function () {
+    Route::get('/users', [AdminUserController::class, 'getAllUsers']);
+    Route::put('/update-user/{id}', [AdminUserController::class, 'updateUser']);
+
+});
 
 // ==============================
 //  PUBLIC PRODUCT ROUTES
