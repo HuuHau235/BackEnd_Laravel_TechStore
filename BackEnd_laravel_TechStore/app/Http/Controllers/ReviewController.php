@@ -58,7 +58,7 @@ class ReviewController extends Controller
                         'api_secret' => env('CLOUDINARY_API_SECRET'),
                     ]
                 ]);
-                return response()->json(['error' => 'Không thể tải ảnh lên Cloudinary'], 500);
+                return response()->json(['error' => 'Unable to upload image to Cloudinary'], 500);
             }
         }
 
@@ -69,6 +69,6 @@ class ReviewController extends Controller
             'image_url' => $imageUrl,
         ]);
 
-        return response()->json(['message' => 'Đánh giá đã được gửi thành công.'], 201);
+        return response()->json(['message' => 'Review submitted successfully.'], 201);
     } 
 }

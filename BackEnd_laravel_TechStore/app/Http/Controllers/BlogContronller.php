@@ -28,7 +28,7 @@ class BlogContronller extends Controller
         $blog = $this->blogService->getBlogById($id);
 
         if (!$blog) {
-            return response()->json(['message' => 'Không tìm thấy bài viết'], 404);
+            return response()->json(['message' => 'Article not found'], 404);
         }
 
         return response()->json($blog);

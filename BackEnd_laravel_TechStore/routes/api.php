@@ -88,6 +88,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/product/{productId}/related',       [ProductController::class, 'getRelatedProducts']);
     Route::post('/product/add-to-cart',              [ProductController::class, 'add_to_cart']);
     Route::post('/product/add-to-wishlist',          [ProductController::class, 'add_to_wishlist']);
+    Route::post('/product/remove-from-wishlist', [ProductController::class, 'removeFromWishlist']);
     Route::post('/product/buy-now',                  [ProductController::class, 'buyNow']);
     Route::get('/reviews/product/{productId}',       [ReviewController::class, 'getReviewsByProduct']);
     Route::get('/specification/product/{productId}', [ProductSpecificationController::class, 'getByProductId']);

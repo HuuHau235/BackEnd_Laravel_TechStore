@@ -41,7 +41,6 @@ class ProductRepository
             });
     }
 
-
     public function getFeaturedProducts(array $types = ['featured product', 'best deal'], $limit = 10)
     {
         return Product::with(['images', 'category', 'reviews'])
@@ -54,6 +53,7 @@ class ProductRepository
                 return $product;
             });
     }
+
     public function getAllWithImages()
     {
         return Product::with('images')->get()->transform(function ($product) {
@@ -61,6 +61,7 @@ class ProductRepository
             return $product;
         });
     }
+
     public function getProductCategories()
     {
         return Product::with('category')
@@ -69,13 +70,6 @@ class ProductRepository
             ->unique('id')
             ->values();
     }
-
-    // public function getCartItemsByUser($userId)
-    // {
-    //     return ProductCart::with('product.firstImage')  /* lấy từ hàm firstImage bên trong Product model */
-    //     ->where('user_id', $userId)
-    //     ->get();
-    // }
 
     public function getCartItemsByUser($userId)
     {
@@ -240,21 +234,44 @@ class ProductRepository
             });
     }
 
-
     public function addToCart(int $userId, int $productId, int $quantity, ?string $color)
     {
-        return ProductCart::updateOrCreate(
-            ['user_id' => $userId, 'product_id' => $productId],
-            ['quantity' => $quantity, 'color' => $color]
-        );
+        $cartItem = ProductCart::where('user_id', $userId)
+            ->where('product_id', $productId)
+            ->where('color', $color)
+            ->first();
+
+        if ($cartItem) {
+            $cartItem->quantity += $quantity;
+            $cartItem->save();
+            return $cartItem;
+        }
+
+        return ProductCart::create([
+            'user_id'    => $userId,
+            'product_id' => $productId,
+            'quantity'   => $quantity,
+            'color'      => $color,
+        ]);
     }
 
-    public function addToWishlist(int $userId, int $productId)
+    public function addToWishlist(int $userId, int $productId, ?string $color)
     {
         return ProductFavorite::firstOrCreate([
             'user_id' => $userId,
             'product_id' => $productId,
+            'color' => $color,
         ]);
+    }
+
+    public function removeFromWishlist(int $userId, int $productId, ?string $color)
+    {
+        return ProductFavorite::where('user_id', $userId)
+            ->where('product_id', $productId)
+            ->when($color, function ($query) use ($color) {
+                $query->where('color', $color);
+            })
+            ->delete();
     }
 
     public function createOrderImmediately(int $userId, int $productId, int $quantity, ?string $color)
