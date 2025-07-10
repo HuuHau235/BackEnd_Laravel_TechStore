@@ -121,7 +121,7 @@ class AuthService
 
         if (!$result || !$this->repository->validatePassword($result['user'], $credentials['password'])) {
             throw new HttpResponseException(response()->json([
-                'message' => 'Fullname hoặc mật khẩu không chính xác.'
+                'message' => 'Full name or password is incorrect.'
             ], 401)); 
         }
 

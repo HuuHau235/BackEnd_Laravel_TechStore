@@ -31,7 +31,7 @@ class MoMoController extends Controller
 
     public function momoPayment(Request $request)
     {
-        Log::info('🎯 Dữ liệu nhận từ React:', $request->all());
+        Log::info('🎯 Data received from React:', $request->all());
 
         $amount = $request->input('amount');
         $orderId = $request->input('order_id');
@@ -39,7 +39,7 @@ class MoMoController extends Controller
 
         if (!$amount || !$orderId) {
             return response()->json([
-                'message' => 'Thiếu amount hoặc order_id!'
+                'message' => 'The request is missing the amount or order_id!'
             ], 400);
         }
 
@@ -49,7 +49,7 @@ class MoMoController extends Controller
         $accessKey = 'klm05TvNBzhg7h7j';
         $secretKey = 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa';
 
-        $orderInfo = "Thanh toán đơn hàng #$orderId";
+        $orderInfo = "Pay for the order #$orderId";
         $redirectUrl = "http://localhost:3000/user/payment_confirmation";
         $ipnUrl = "http://localhost:8000/api/momo/ipn";
         $extraData = "";
@@ -78,18 +78,18 @@ class MoMoController extends Controller
         $result = $this->execPostRequest($endpoint, json_encode($data));
         $jsonResult = json_decode($result, true);
 
-        Log::info('📥 Phản hồi từ MoMo:', $jsonResult);
+        Log::info('📥 Response from MoMo:', $jsonResult);
 
         if (!isset($jsonResult['payUrl'])) {
             return response()->json([
                 'payUrl' => null,
-                'message' => 'MoMo trả về lỗi hoặc dữ liệu không hợp lệ.'
+                'message' => 'MoMo responded with an error or invalid data.'
             ], 400);
         }
 
         return response()->json([
             'payUrl' => $jsonResult['payUrl'],
-            'message' => 'Tạo liên kết MoMo thành công.'
+            'message' => 'Successfully generated MoMo payment link.'
         ]);
     }
 }

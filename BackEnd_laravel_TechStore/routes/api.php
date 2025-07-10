@@ -91,6 +91,19 @@ Route::middleware('auth:sanctum')->prefix('user')->group(function () {
     Route::post('/order/confirm-payment', [OrderController::class, 'confirmPayment']);
 });
 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/product/{productId}/detail',        [ProductController::class, 'getProductDetail']);
+    Route::get('/product/{productId}/related',       [ProductController::class, 'getRelatedProducts']);
+    Route::post('/product/add-to-cart',              [ProductController::class, 'add_to_cart']);
+    Route::post('/product/add-to-wishlist',          [ProductController::class, 'add_to_wishlist']);
+    Route::post('/product/remove-from-wishlist', [ProductController::class, 'removeFromWishlist']);
+    Route::post('/product/buy-now',                  [ProductController::class, 'buyNow']);
+    Route::get('/reviews/product/{productId}',       [ReviewController::class, 'getReviewsByProduct']);
+    Route::get('/specification/product/{productId}', [ProductSpecificationController::class, 'getByProductId']);
+    Route::get('/description/product/{productId}',   [ProductDescriptionController::class, 'getByProductId']);
+    Route::post('/product/{productId}/review', [ReviewController::class, 'storeReview']);
+});
+
 Route::prefix('user')->group(function () {
     Route::get('/getUserId', [UserController::class, 'getCurrentUserId']);
     Route::get('/{id}', [UserController::class, 'getUserById']);
@@ -109,9 +122,9 @@ Route::prefix('user')->group(function () {
     Route::get('/product/index', [ProductController::class, 'index']);
     Route::get('/product/promoted', [ProductController::class, 'getPromotedProducts']);
     Route::get('/product/categories', [ProductController::class, 'getProductCategories']);
-    Route::get('/reviews/product/{productId}', [ReviewController::class, 'getReviewsByProduct']);
-    Route::get('/specification/product/{productId}', [ProductSpecificationController::class, 'getByProductId']);
-    Route::get('/description/product/{productId}', [ProductDescriptionController::class, 'getByProductId']);
+    // Route::get('/reviews/product/{productId}', [ReviewController::class, 'getReviewsByProduct']);
+    // Route::get('/specification/product/{productId}', [ProductSpecificationController::class, 'getByProductId']);
+    // Route::get('/description/product/{productId}', [ProductDescriptionController::class, 'getByProductId']);
     Route::get('/wishlist/{id}', [ProductFavoriteController::class, 'getUserFavorites']);
     Route::delete('/delete/wishlist/{id}', [ProductFavoriteController::class, 'destroy']);
     Route::post('/wishlist/add', [ProductFavoriteController::class, 'add']);

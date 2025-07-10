@@ -10,6 +10,12 @@ class ReviewRepository
         return Review::with('user') // lấy luôn thông tin user
                      ->where('product_id', $productId)
                      ->orderByDesc('review_date')
-                     ->get();
+                     ->get(); 
+    }
+
+    public function create(array $data)
+    {
+        \Log::info('Review Data:', $data);
+        return Review::create($data);
     }
 }
