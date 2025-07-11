@@ -128,14 +128,11 @@ Route::prefix('user')->group(function () {
     Route::get('/product/index', [ProductController::class, 'index']);
     Route::get('/product/promoted', [ProductController::class, 'getPromotedProducts']);
     Route::get('/product/categories', [ProductController::class, 'getProductCategories']);
-    // Route::get('/reviews/product/{productId}', [ReviewController::class, 'getReviewsByProduct']);
-    // Route::get('/specification/product/{productId}', [ProductSpecificationController::class, 'getByProductId']);
-    // Route::get('/description/product/{productId}', [ProductDescriptionController::class, 'getByProductId']);
+
+
     Route::get('/wishlist/{id}', [ProductFavoriteController::class, 'getUserFavorites']);
     Route::delete('/delete/wishlist/{id}', [ProductFavoriteController::class, 'destroy']);
     Route::post('/wishlist/add', [ProductFavoriteController::class, 'add']);
-
-
     // Order
     Route::post('/orders/create', [OrderController::class, 'createOrder']);
     Route::put('/orders/{orderId}/update-info', [OrderController::class, 'updateOrderInfo']);
