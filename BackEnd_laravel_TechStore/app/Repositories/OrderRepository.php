@@ -77,5 +77,23 @@ class OrderRepository
             ]
         ];
     }
-
+    public function getOrdersByUserAndDate($userId, $date = null)
+    {
+        return Order::with(['orderDetails.product'])
+            ->where('user_id', $userId)
+            ->when($date, function ($query) use ($date) {
+                return $query->whereDate('order_date', $date);
+            })
+            ->orderBy('order_date', 'desc')
+            ->get();
+    }
+    public function deleteHistory($userId, $productId, $date)
+    {
+        return OrderDetail::whereHas('order', function ($query) use ($userId, $date) {
+            $query->where('user_id', $userId)
+                ->whereDate('order_date', $date);
+        })
+            ->where('product_id', $productId)
+            ->delete();
+    }
 }

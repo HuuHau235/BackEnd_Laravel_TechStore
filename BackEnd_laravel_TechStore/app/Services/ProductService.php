@@ -169,19 +169,15 @@ class ProductService
             throw new \Exception('Product not found.');
         }
 
-        // 🔍 Lấy số lượng đã có trong giỏ hàng
         $existingCartItem = $this->productRepository->getCartItem($userId, $productId);
         $alreadyInCart = $existingCartItem ? $existingCartItem->quantity : 0;
 
-        // 🔢 Tổng số lượng sau khi thêm
         $totalQuantity = $alreadyInCart + $quantity;
 
-        // ❌ Nếu vượt quá tồn kho
         if ($totalQuantity > $product->stock) {
             throw new \Exception("Requested quantity exceeds available stock.");
         }
 
-        // ✅ Cho phép thêm
         return $this->productRepository->addOrUpdateCart($userId, $productId, $quantity);
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Order;
 use App\Repositories\OrderRepository;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
@@ -29,7 +30,7 @@ class OrderService
     public function updateOrderInfo($orderId, $data)
     {
         return $this->orderRepository->update($orderId, [
-           'full_name' => $data['full_name'],
+            'full_name' => $data['full_name'],
             'phone' => $data['phone'],
             'address' => $data['address'],
             'province' => $data['province'],
@@ -46,7 +47,7 @@ class OrderService
     public function confirmOrderAndSendMail($userId)
     {
         $orderData = $this->orderRepository->getLatestOrderByUser($userId);
-        
+
         $email = $orderData['customer']['email'];
         $name = $orderData['customer']['fullname'];
         $orderCode = $orderData['order_code'];
@@ -103,4 +104,24 @@ class OrderService
         // Xoá file PDF sau khi gửi
         unlink($pdfPath);
     }
+    public function getOrderHistoryByDate($userId, $date)
+    {
+        return Order::with([
+            'orderDetails.product.images'
+        ])
+            ->where('user_id', $userId)
+            ->when($date, function ($query) use ($date) {
+                $query->whereDate('order_date', $date);
+            })
+            ->orderBy('order_date', 'desc')
+            ->get();
+    }
+    public function deleteOrderHistory(array $data)
+    {
+        return $this->orderRepository->deleteHistory($data['user_id'], $data['product_id'], $data['date']);
+    }
+    public function deleteSingleOrderDetail($orderDetailId)
+{
+    return \App\Models\OrderDetail::where('id', $orderDetailId)->delete();
+}
 }
