@@ -278,4 +278,22 @@ class ProductService
         // Gọi Repository để tạo đơn hàng tạm thời
         return $this->productRepository->createOrderImmediately($userId, $productId, $quantity, $color);
     }
+    public function getProductsByCategoryId($categoryId)
+    {
+        $products = $this->productRepository->getProductsByCategoryId($categoryId);
+
+        return $products->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'category_name' => $product->category->name ?? null,
+                'price' => $product->price,
+                'old_price' => $product->old_price,
+                'promotion_type' => $product->promotion_type,
+                'stock' => $product->stock,
+                'status' => $product->status,
+                'image_url' => $product->images->first()->image_url ?? null,
+            ];
+        });
+    }
 }
