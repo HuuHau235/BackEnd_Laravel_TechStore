@@ -35,6 +35,11 @@ Route::prefix('admin')->group(function () {
     Route::delete('/delete-reviews/{id}', [AdminReviewController::class, 'deleteReview']);
     Route::get('/orders', [AdminOrderController::class, 'getOrders']);
     Route::delete('/orders/{id}', [AdminOrderController::class, 'deleteOrder']);
+    Route::get('/product/smartphone', [ProductCategoryController::class, 'getSmartPhone']);
+    Route::get('/product/laptop', [ProductCategoryController::class, 'getLaptop']);
+    Route::get('/product/headphone', [ProductCategoryController::class, 'getHeadPhone']);
+    Route::get('/product/keyboard', [ProductCategoryController::class, 'getKeyboard']);
+    Route::get('/product/mouse', [ProductCategoryController::class, 'getMouse']);
     Route::get('/product/camera', [ProductCategoryController::class, 'getCamera']);
     Route::get('/product/smartwatch', [ProductCategoryController::class, 'getSmartWatch']);
     Route::get('/product/charging', [ProductCategoryController::class, 'getChargingAccessory']);
