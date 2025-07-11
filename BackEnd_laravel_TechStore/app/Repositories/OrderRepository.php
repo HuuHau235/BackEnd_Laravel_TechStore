@@ -4,6 +4,8 @@ namespace App\Repositories;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\OrderDetail;
+use Illuminate\Support\Facades\DB;
+
 
 class OrderRepository
 {
@@ -76,6 +78,27 @@ class OrderRepository
                 'total' => number_format($total, 2),
             ]
         ];
+    }
+
+        public function fetchOrdersWithUser()
+    {
+        return DB::table('orders')
+            ->join('users', 'orders.user_id', '=', 'users.id')
+            ->select(
+                'orders.id',
+                'users.name as user_name',
+                'orders.status',
+                'orders.shipping_option',
+                'orders.total_amount',
+                'orders.created_at as order_date'
+            )
+            ->orderBy('orders.created_at', 'desc')
+            ->get();
+    }
+
+    public function deleteOrderById($id)
+    {
+        return DB::table('orders')->where('id', $id)->delete();
     }
 
 }

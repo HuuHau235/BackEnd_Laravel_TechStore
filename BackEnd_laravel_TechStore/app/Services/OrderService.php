@@ -103,4 +103,14 @@ class OrderService
         // Xoá file PDF sau khi gửi
         unlink($pdfPath);
     }
+
+    public function getAllOrders()
+    {
+        return $this->orderRepository->fetchOrdersWithUser();
+    }
+
+    public function deleteOrder($id)
+    {
+        return $this->orderRepository->deleteOrderById($id);
+    }
 }
