@@ -12,6 +12,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductSpecificationController;
 use App\Http\Controllers\ProductDescriptionController;
 use App\Http\Controllers\ProductFavoriteController;
@@ -101,6 +102,14 @@ Route::middleware('auth:sanctum')->prefix('user')->group(function () {
     Route::post('/cart/add', [ProductController::class, 'addToCart']);
     Route::get('/order/confirmation', [OrderController::class, 'getConfirmationDetails']);
     Route::post('/order/confirm-payment', [OrderController::class, 'confirmPayment']);
+});
+
+Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
+    Route::get('/dashboard/summary', [DashboardController::class, 'getSummary']);
+    Route::get('/dashboard/monthly-revenue', [DashboardController::class, 'getMonthlyRevenue']);
+    Route::get('/dashboard/revenue-by-category', [DashboardController::class, 'getRevenueByCategory']);
+    Route::get('/dashboard/order-status-distribution', [DashboardController::class, 'getOrderStatusDistribution']);
+    Route::get('/dashboard/top-selling-products', [DashboardController::class, 'getTopSellingProducts']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
