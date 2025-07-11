@@ -40,7 +40,6 @@ class PaymentService
             'status' => 'Completed',
             'payment_date' => Carbon::now(),
         ]);
-
         return $payment;
 
     }

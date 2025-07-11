@@ -43,4 +43,13 @@ class UserService
     {
         return $this->userRepository->updateAvatar($userId, $avatarUrl);
     }
+    public function getAllUsers()
+    {
+        return $this->userRepository->getAllUsers();
+    }
+
+     public function updateUser($id, $data)
+    {
+        return $this->userRepository->update($id, $data);
+    }
 }

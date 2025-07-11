@@ -146,6 +146,21 @@ class ProductService
     }
 
 
+    // public function addToCart($userId, $productId, $quantity)
+    // {
+    //     $product = $this->productRepository->findProductById($productId);
+
+    //     if (!$product) {
+    //         throw new \Exception('Product not found.');
+    //     }
+
+    //     if ($quantity > $product->stock) {
+    //         throw new \Exception('Requested quantity exceeds available stock.');
+    //     }
+
+    //     return $this->productRepository->addOrUpdateCart($userId, $productId, $quantity);
+    // }
+
     public function addToCart($userId, $productId, $quantity)
     {
         $product = $this->productRepository->findProductById($productId);
@@ -154,12 +169,22 @@ class ProductService
             throw new \Exception('Product not found.');
         }
 
-        if ($quantity > $product->stock) {
-            throw new \Exception('Requested quantity exceeds available stock.');
+        // 🔍 Lấy số lượng đã có trong giỏ hàng
+        $existingCartItem = $this->productRepository->getCartItem($userId, $productId);
+        $alreadyInCart = $existingCartItem ? $existingCartItem->quantity : 0;
+
+        // 🔢 Tổng số lượng sau khi thêm
+        $totalQuantity = $alreadyInCart + $quantity;
+
+        // ❌ Nếu vượt quá tồn kho
+        if ($totalQuantity > $product->stock) {
+            throw new \Exception("Requested quantity exceeds available stock.");
         }
 
+        // ✅ Cho phép thêm
         return $this->productRepository->addOrUpdateCart($userId, $productId, $quantity);
     }
+
 
     public function getAllProductsWithImages()
     {
@@ -171,7 +196,9 @@ class ProductService
         return $this->productRepository->getTopFiveProducts();
     }
 
-    public function getProductDetailById(int $productId) {
+
+    public function getProductDetailById(int $productId)
+    {
         return $this->productRepository->getProductWithImagesAndColors($productId);
     }
 
@@ -179,7 +206,7 @@ class ProductService
     {
         return $this->productRepository->find($productId);
     }
-    
+
     public function getRelatedProductsByCategory($categoryId, $excludeProductId)
     {
         return $this->productRepository->getRelatedProducts($categoryId, $excludeProductId);
@@ -214,7 +241,8 @@ class ProductService
         return $this->productRepository->addToCart($userId, $productId, $quantity, $color);
     }
 
-    public function addProductToWishlist(int $userId, int $productId, ?string $color) {
+    public function addProductToWishlist(int $userId, int $productId, ?string $color)
+    {
         return $this->productRepository->addToWishlist($userId, $productId, $color);
     }
 
@@ -249,5 +277,23 @@ class ProductService
 
         // Gọi Repository để tạo đơn hàng tạm thời
         return $this->productRepository->createOrderImmediately($userId, $productId, $quantity, $color);
+    }
+    public function getProductsByCategoryId($categoryId)
+    {
+        $products = $this->productRepository->getProductsByCategoryId($categoryId);
+
+        return $products->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'category_name' => $product->category->name ?? null,
+                'price' => $product->price,
+                'old_price' => $product->old_price,
+                'promotion_type' => $product->promotion_type,
+                'stock' => $product->stock,
+                'status' => $product->status,
+                'image_url' => $product->images->first()->image_url ?? null,
+            ];
+        });
     }
 }
