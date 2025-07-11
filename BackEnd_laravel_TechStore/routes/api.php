@@ -18,6 +18,7 @@ use App\Http\Controllers\ProductFavoriteController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\Admin\ProductCategoryController;
 
 
 /*
@@ -33,6 +34,11 @@ Route::prefix('admin')->group(function () {
     Route::delete('/delete-reviews/{id}', [AdminReviewController::class, 'deleteReview']);
     Route::get('/orders', [AdminOrderController::class, 'getOrders']);
     Route::delete('/orders/{id}', [AdminOrderController::class, 'deleteOrder']);
+    Route::get('/product/camera', [ProductCategoryController::class, 'getCamera']);
+    Route::get('/product/smartwatch', [ProductCategoryController::class, 'getSmartWatch']);
+    Route::get('/product/charging', [ProductCategoryController::class, 'getChargingAccessory']);
+    Route::get('/product/tv', [ProductCategoryController::class, 'getTV']);
+    Route::get('/product/air-conditioner', [ProductCategoryController::class, 'getAirConditioner']);
 
 });
 
