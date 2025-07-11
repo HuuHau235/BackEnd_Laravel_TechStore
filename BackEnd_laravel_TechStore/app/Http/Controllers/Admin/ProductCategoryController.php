@@ -14,6 +14,31 @@ class ProductCategoryController extends Controller
         $this->productService = $productService;
     }
 
+    public function getSmartPhone()
+    {
+        return response()->json($this->productService->getProductsByCategoryId(1));
+    }
+
+    public function getLaptop()
+    {
+        return response()->json($this->productService->getProductsByCategoryId(2));
+    }
+
+    public function getHeadPhone()
+    {
+        return response()->json($this->productService->getProductsByCategoryId(3));
+    }
+
+    public function getKeyboard()
+    {
+        return response()->json($this->productService->getProductsByCategoryId(4));
+    }
+
+    public function getMouse()
+    {
+        return response()->json($this->productService->getProductsByCategoryId(5));
+    }
+    
     public function getCamera()
     {
         return response()->json($this->productService->getProductsByCategoryId(6));
