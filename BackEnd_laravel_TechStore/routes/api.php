@@ -16,6 +16,8 @@ use App\Http\Controllers\ProductSpecificationController;
 use App\Http\Controllers\ProductDescriptionController;
 use App\Http\Controllers\ProductFavoriteController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminReviewController;
+use App\Http\Controllers\Admin\AdminOrderController;
 
 
 /*
@@ -27,6 +29,10 @@ use App\Http\Controllers\Admin\AdminUserController;
 Route::prefix('admin')->group(function () {
     Route::get('/users', [AdminUserController::class, 'getAllUsers']);
     Route::put('/update-user/{id}', [AdminUserController::class, 'updateUser']);
+    Route::get('/reviews', [AdminReviewController::class, 'getUserReviews']);
+    Route::delete('/delete-reviews/{id}', [AdminReviewController::class, 'deleteReview']);
+    Route::get('/orders', [AdminOrderController::class, 'getOrders']);
+    Route::delete('/orders/{id}', [AdminOrderController::class, 'deleteOrder']);
 
 });
 
