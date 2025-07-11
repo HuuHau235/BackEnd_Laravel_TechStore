@@ -304,4 +304,10 @@ class ProductRepository
         ->first();
 }
 
+public function getProductsByCategoryId($categoryId)
+    {
+        return Product::with(['category', 'images'])
+            ->where('category_id', $categoryId)
+            ->get();
+    }
 }
