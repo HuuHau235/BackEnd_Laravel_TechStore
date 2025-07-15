@@ -15,6 +15,11 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ProductSpecificationController;
 use App\Http\Controllers\ProductDescriptionController;
 use App\Http\Controllers\ProductFavoriteController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminReviewController;
+use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\Admin\ProductCategoryController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +27,28 @@ use App\Http\Controllers\ProductFavoriteController;
 |--------------------------------------------------------------------------
 | Tất cả route ở đây được tự động gắn prefix là /api
 */
+Route::prefix('admin')->group(function () {
+    Route::get('/users', [AdminUserController::class, 'getAllUsers']);
+    Route::put('/update-user/{id}', [AdminUserController::class, 'updateUser']);
+    Route::get('/reviews', [AdminReviewController::class, 'getUserReviews']);
+    Route::delete('/delete-reviews/{id}', [AdminReviewController::class, 'deleteReview']);
+    Route::get('/orders', [AdminOrderController::class, 'getOrders']);
+    Route::delete('/orders/{id}', [AdminOrderController::class, 'deleteOrder']);
+    Route::get('/product/camera', [ProductCategoryController::class, 'getCamera']);
+    Route::get('/product/smartwatch', [ProductCategoryController::class, 'getSmartWatch']);
+    Route::get('/product/charging', [ProductCategoryController::class, 'getChargingAccessory']);
+    Route::get('/product/tv', [ProductCategoryController::class, 'getTV']);
+    Route::get('/product/air-conditioner', [ProductCategoryController::class, 'getAirConditioner']);
+    Route::get('/products/stock-statistics', [ProductController::class, 'getStockStatistics']);
+    Route::get('/group-by-category', [ProductController::class, 'getProductsGroupedByCategory']);
+    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+Route::put('update/products/{id}', [ProductCategoryController::class, 'update']);
+Route::get('/categories', [ProductCategoryController::class, 'index']);
+Route::get('edit/products/{id}', [ProductCategoryController::class, 'show']);
+Route::post('create/products', [ProductCategoryController::class, 'store']);
+Route::get('/promotion-types', [ProductController::class, 'getPromotionTypes']);
+
+});
 
 // ==============================
 //  PUBLIC PRODUCT ROUTES
@@ -33,6 +60,7 @@ Route::prefix('products')->group(function () {
     Route::get('/top-images', [CategoryController::class, 'GetImage']);
     Route::get('/search', [ProductController::class, 'getProductByKeyWord']);
     Route::get('/all-categories', [CategoryController::class, 'index']);
+
 
 });
 // ==============================
@@ -116,6 +144,7 @@ Route::prefix('user')->group(function () {
     Route::get('/product/index', [ProductController::class, 'index']);
     Route::get('/product/promoted', [ProductController::class, 'getPromotedProducts']);
     Route::get('/product/categories', [ProductController::class, 'getProductCategories']);
+    
 
 
     Route::get('/wishlist/{id}', [ProductFavoriteController::class, 'getUserFavorites']);

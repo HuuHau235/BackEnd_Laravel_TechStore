@@ -124,4 +124,14 @@ class OrderService
 {
     return \App\Models\OrderDetail::where('id', $orderDetailId)->delete();
 }
+
+    public function getAllOrders()
+    {
+        return $this->orderRepository->fetchOrdersWithUser();
+    }
+
+    public function deleteOrder($id)
+    {
+        return $this->orderRepository->deleteOrderById($id);
+    }
 }

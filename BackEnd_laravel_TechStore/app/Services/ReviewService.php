@@ -29,4 +29,14 @@ class ReviewService
             'review_date' => now(),
         ]);
     }
+
+    public function getUserReviews()
+    {
+        return $this->reviewRepo->getUserReviewsWithInfo();
+    }
+
+    public function deleteReview($id)
+{
+    return $this->reviewRepo->deleteReviewById($id);
+}
 }
