@@ -21,10 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Schema::defaultStringLength(191);
+        // Schema::defaultStringLength(191);
 
-        if (app()->environment('production')) {
-            Artisan::call('migrate', ['--force' => true]);
+        // if (app()->environment('production')) {
+        //     Artisan::call('migrate', ['--force' => true]);
     }
     }
-}
