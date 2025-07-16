@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Exceptions\OutOfStockException;
+use Exception;
 
 class ProductController extends Controller
 {
@@ -231,7 +232,8 @@ class ProductController extends Controller
         return response()->json($products);
     }
 
-    public function getProductDetail($productId) {
+    public function getProductDetail($productId)
+    {
         return response()->json($this->productService->getProductDetailById($productId));
     }
 
@@ -258,8 +260,8 @@ class ProductController extends Controller
         try {
             $request->validate([
                 'product_id' => 'required|integer|exists:products,id',
-                'quantity'   => 'required|integer|min:1',
-                'color'      => 'nullable|string'
+                'quantity' => 'required|integer|min:1',
+                'color' => 'nullable|string'
             ]);
 
             $userId = auth()->id();
@@ -276,25 +278,26 @@ class ProductController extends Controller
 
             return response()->json([
                 'message' => 'Product added to cart successfully.',
-                'data'    => $cartItem
+                'data' => $cartItem
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
         } catch (OutOfStockException $e) {
             return response()->json([
-                'message'  => $e->getMessage(),
-                'stock'    => $e->stock,
-                'in_cart'  => $e->inCart,
+                'message' => $e->getMessage(),
+                'stock' => $e->stock,
+                'in_cart' => $e->inCart,
             ], 400);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
-    public function add_to_wishlist(Request $request) {
+    public function add_to_wishlist(Request $request)
+    {
         $request->validate([
             'product_id' => 'required|integer|exists:products,id',
-            'color'      => 'nullable|string'
+            'color' => 'nullable|string'
         ]);
         return response()->json(
             $this->productService->addProductToWishlist(
@@ -350,6 +353,75 @@ class ProductController extends Controller
             ]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+    public function getProductsGroupedByCategory(): JsonResponse
+    {
+        try {
+            $result = $this->productService->getProductsGroupedByCategory();
+
+            return response()->json([
+                'status' => true,
+                'data' => $result
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error fetching grouped products',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    public function getStockStatistics(): JsonResponse
+    {
+        try {
+            $data = $this->productService->getStockStatistics();
+
+            return response()->json([
+                'status' => true,
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error getting product statistics',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            $this->productService->deleteProduct($id);
+
+            return response()->json([
+                'status' => true,
+                'message' => "Product ID {$id} deleted successfully",
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+    // Get product of promotion type
+    public function getPromotionTypes()
+    {
+        try {
+            $types = $this->productService->getPromotionTypes();
+
+            return response()->json([
+                'status' => true,
+                'data' => $types
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to fetch promotion types'
+            ], 500);
         }
     }
 }
