@@ -12,6 +12,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductSpecificationController;
 use App\Http\Controllers\ProductDescriptionController;
 use App\Http\Controllers\ProductFavoriteController;
@@ -34,6 +35,11 @@ Route::prefix('admin')->group(function () {
     Route::delete('/delete-reviews/{id}', [AdminReviewController::class, 'deleteReview']);
     Route::get('/orders', [AdminOrderController::class, 'getOrders']);
     Route::delete('/orders/{id}', [AdminOrderController::class, 'deleteOrder']);
+    Route::get('/product/smartphone', [ProductCategoryController::class, 'getSmartPhone']);
+    Route::get('/product/laptop', [ProductCategoryController::class, 'getLaptop']);
+    Route::get('/product/headphone', [ProductCategoryController::class, 'getHeadPhone']);
+    Route::get('/product/keyboard', [ProductCategoryController::class, 'getKeyboard']);
+    Route::get('/product/mouse', [ProductCategoryController::class, 'getMouse']);
     Route::get('/product/camera', [ProductCategoryController::class, 'getCamera']);
     Route::get('/product/smartwatch', [ProductCategoryController::class, 'getSmartWatch']);
     Route::get('/product/charging', [ProductCategoryController::class, 'getChargingAccessory']);
@@ -111,6 +117,14 @@ Route::middleware('auth:sanctum')->prefix('user')->group(function () {
     Route::get('/order/confirmation', [OrderController::class, 'getConfirmationDetails']);
     Route::post('/order/confirm-payment', [OrderController::class, 'confirmPayment']);
     Route::get('/order-history', [OrderController::class, 'getOrderHistoryByDate']);
+});
+
+Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
+    Route::get('/dashboard/summary', [DashboardController::class, 'getSummary']);
+    Route::get('/dashboard/monthly-revenue', [DashboardController::class, 'getMonthlyRevenue']);
+    Route::get('/dashboard/revenue-by-category', [DashboardController::class, 'getRevenueByCategory']);
+    Route::get('/dashboard/order-status-distribution', [DashboardController::class, 'getOrderStatusDistribution']);
+    Route::get('/dashboard/top-selling-products', [DashboardController::class, 'getTopSellingProducts']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {

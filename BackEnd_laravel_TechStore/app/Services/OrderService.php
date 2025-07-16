@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Order;
 use App\Repositories\OrderRepository;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class OrderService
@@ -98,7 +99,7 @@ class OrderService
             $mailer = app(\App\Services\MailerService::class);
             $mailer->send($email, 'Order Confirmation - ' . $orderCode, $body, $pdfPath);
         } catch (\Exception $e) {
-            \Log::error('Send mail failed: ' . $e->getMessage());
+            Log::error('Send mail failed: ' . $e->getMessage());
         }
 
         // Xoá file PDF sau khi gửi

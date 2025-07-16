@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Order;
 use App\Models\OrderDetail;
-
+use App\Models\Payment;
 
 class OrderController extends Controller
 {
@@ -96,15 +96,25 @@ class OrderController extends Controller
                 return $item['quantity'] * $item['unit_price'];
             });
 
+            // $order = Order::create([
+            //     'user_id' => $userId,
+            //     'order_date' => now(),
+            //     'status' => 'pending',
+            //     'shipping_option' => "free",
+            //     'total_amount' => $total,
+            //     'coupon_code' => null,
+            //     'discount' => 0,
+            // ]);
+
             $order = Order::create([
-                'user_id' => $userId,
-                'order_date' => now(),
-                'status' => 'pending',
-                'shipping_option' => "free",
-                'total_amount' => $total,
-                'coupon_code' => null,
-                'discount' => 0,
-            ]);
+    'user_id' => $userId,
+    'order_date' => now(),
+    'status' => 'pending',
+    'shipping_option' => "free",
+    'total_amount' => $total,
+    'coupon_code' => null,
+    'discount' => 0,
+]);
 
             foreach ($request->products as $product) {
                 OrderDetail::create([
@@ -114,6 +124,13 @@ class OrderController extends Controller
                     'unit_price' => $product['unit_price'],
                 ]);
             }
+
+            Payment::create([
+    'order_id' => $order->id,
+    'method' => 'cash', // hoặc từ $request->method nếu cần
+    'status' => 'pending',
+    'payment_date' => now(),
+]);
 
             DB::commit();
 
@@ -165,16 +182,18 @@ class OrderController extends Controller
 
 public function deleteHistory(Request $request)
 {
-    $validated = $request->validate([
-        'order_detail_id' => 'required|integer',
-    ]);
+    $orderId = $request->input('order_id');
 
-    $deleted = $this->orderService->deleteSingleOrderDetail($validated['order_detail_id']);
+    $order = Order::find($orderId);
 
-    return response()->json([
-        'message' => $deleted ? 'Xoá thành công' : 'Không tìm thấy',
-        'deleted' => $deleted
-    ]);
+    if (!$order) {
+        return response()->json(['message' => 'Order not found'], 404);
+    }
+
+    $order->orderDetails()->delete();
+    $order->delete();
+
+    return response()->json(['message' => 'Order deleted successfully']);
 }
 
 }

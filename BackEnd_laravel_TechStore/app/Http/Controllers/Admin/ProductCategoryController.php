@@ -22,6 +22,37 @@ class ProductCategoryController extends Controller
     }
 
     // ========== API GET theo category ==========
+
+    // public function __construct(ProductService $productService)
+    // {
+    //     $this->productService = $productService;
+    // }
+
+    public function getSmartPhone()
+    {
+        return response()->json($this->productService->getProductsByCategoryId(1));
+    }
+
+    public function getLaptop()
+    {
+        return response()->json($this->productService->getProductsByCategoryId(2));
+    }
+
+    public function getHeadPhone()
+    {
+        return response()->json($this->productService->getProductsByCategoryId(3));
+    }
+
+    public function getKeyboard()
+    {
+        return response()->json($this->productService->getProductsByCategoryId(4));
+    }
+
+    public function getMouse()
+    {
+        return response()->json($this->productService->getProductsByCategoryId(5));
+    }
+    
     public function getCamera()
     {
         return response()->json($this->productService->getProductsByCategoryId(6));
@@ -148,7 +179,7 @@ class ProductCategoryController extends Controller
 
         return response()->json(['message' => 'Product created successfully', 'data' => $product]);
     } catch (\Exception $e) {
-        \Log::error($e);
+        Log::error($e);
         return response()->json(['message' => 'Server error', 'error' => $e->getMessage()], 500);
     }
 }
