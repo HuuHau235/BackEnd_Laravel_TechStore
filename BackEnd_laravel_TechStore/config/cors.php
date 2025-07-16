@@ -18,7 +18,10 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:3000'],
+    'allowed_origins' => [
+    'http://localhost:3000', // Giữ lại cho quá trình phát triển cục bộ
+    'https://frontendreacttechstore-production.up.railway.app', // <--- THAY THẾ BẰNG URL THỰC TẾ CỦA FRONTEND CỦA BẠN TRÊN RAILWAY
+    ],
 
     'allowed_origins_patterns' => [],
 
