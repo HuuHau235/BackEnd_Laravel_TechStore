@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Product;
 use App\Models\ProductCart;
 use App\Exceptions\OutOfStockException;
+use Exception;
 
 class ProductService
 {
@@ -169,19 +170,15 @@ class ProductService
             throw new \Exception('Product not found.');
         }
 
-        // 🔍 Lấy số lượng đã có trong giỏ hàng
         $existingCartItem = $this->productRepository->getCartItem($userId, $productId);
         $alreadyInCart = $existingCartItem ? $existingCartItem->quantity : 0;
 
-        // 🔢 Tổng số lượng sau khi thêm
         $totalQuantity = $alreadyInCart + $quantity;
 
-        // ❌ Nếu vượt quá tồn kho
         if ($totalQuantity > $product->stock) {
             throw new \Exception("Requested quantity exceeds available stock.");
         }
 
-        // ✅ Cho phép thêm
         return $this->productRepository->addOrUpdateCart($userId, $productId, $quantity);
     }
 
@@ -295,5 +292,80 @@ class ProductService
                 'image_url' => $product->images->first()->image_url ?? null,
             ];
         });
+    }
+
+    public function getProductsGroupedByCategory()
+    {
+        $categories = $this->productRepository->getProductsGroupedByCategory();
+
+        return $categories->map(function ($category) {
+            return [
+                'category' => $category->name,
+                'products' => $category->products
+            ];
+        });
+    }
+    public function getStockStatistics()
+    {
+        $products = $this->productRepository->getAllProducts();
+
+        $total_products = $products->count();
+        $total_stock = $products->sum('stock');
+        $low_stock_quantity = $products->where('stock', '>', 0)->where('stock', '<', 10)->count();
+        $out_of_stock_quantity = $products->where('stock', '<=', 0)->count();
+        $in_stock_quantity = $products->where('stock', '>=', 10)->count();
+
+        return [
+            'total_products' => $total_products,
+            'total_stock' => $total_stock,
+            'in_stock_quantity' => $in_stock_quantity,
+            'low_stock_quantity' => $low_stock_quantity,
+            'out_of_stock_quantity' => $out_of_stock_quantity,
+        ];
+    }
+public function deleteProduct(int $productId): void
+    {
+        $deleted = $this->productRepository->deleteProduct($productId);
+        if (! $deleted) {
+            throw new Exception("Failed to delete product ID {$productId}");
+        }
+    }
+
+    public function getProductByIdd($id)
+    {
+        return $this->productRepository->findById($id);
+    }
+
+public function updateProduct($id, array $data)
+{
+    $product = Product::findOrFail($id);
+    $product->update($data);
+
+    if (!empty($data['image_url'])) {
+        $existingImage = $product->images()->first();
+
+        if ($existingImage) {
+            $existingImage->update([
+                'image_url' => $data['image_url']
+            ]);
+        } else {
+            $product->images()->create([
+                'image_url' => $data['image_url']
+            ]);
+        }
+    }
+
+    return $product->fresh();
+}
+
+public function createProductManagement(array $data)
+{
+    return $this->productRepository->createProductManagement($data);
+}
+
+    // Get product of promotion type
+    public function getPromotionTypes()
+    {
+        return $this->productRepository->getUniquePromotionTypes();
     }
 }
