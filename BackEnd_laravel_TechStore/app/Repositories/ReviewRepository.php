@@ -8,7 +8,7 @@ class ReviewRepository
 {
     public function getByProductId($productId)
     {
-        return Review::with('user') // lấy luôn thông tin user
+        return Review::with('user')
                      ->where('product_id', $productId)
                      ->orderByDesc('review_date')
                      ->get(); 

@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Repositories;
+
+use App\Models\Category;
 use Illuminate\Support\Facades\DB;
 use App\Models\Product;
 use App\Models\ProductCart;
@@ -309,5 +311,60 @@ public function getProductsByCategoryId($categoryId)
         return Product::with(['category', 'images'])
             ->where('category_id', $categoryId)
             ->get();
+    }
+
+    public function getProductsGroupedByCategory()
+    {
+        return Category::with(['products.images'])->get();
+    }
+    public function getAllProducts()
+    {
+        return Product::all();
+    }
+
+    public function deleteProduct(int $productId): bool
+    {
+        return Product::destroy($productId) > 0;
+    }
+
+
+
+
+ public function findById($id)
+    {
+        return Product::with('category', 'images')->findOrFail($id);
+    }
+
+    public function update($id, array $data)
+    {
+        $product = Product::findOrFail($id);
+        $product->update($data);
+        return $product->fresh();
+    }
+
+   public function createProductManagement(array $data)
+{
+    $imageUrl = $data['image_url'] ?? null;
+    unset($data['image_url']);
+
+    $product = Product::create($data);
+    if ($imageUrl) {
+      dd($product->images()->create([
+    'image_url' => $imageUrl
+]));
+    }
+
+    $product->load('images');
+
+    return $product;
+}
+
+    // Get product of promotion type
+    public function getUniquePromotionTypes()
+    {
+        return Product::select('promotion_type')
+            ->distinct()
+            ->whereNotNull('promotion_type')
+            ->pluck('promotion_type');
     }
 }
