@@ -13,14 +13,29 @@ class MailerService
     {
         $this->mail = new PHPMailer(true);
         $this->mail->isSMTP();
-        $this->mail->Host = env('MAIL_HOST'); 
+        $this->mail->Host = config('mail.host');
         $this->mail->SMTPAuth = true;
+
         $this->mail->Username = env('MAIL_USERNAME'); 
         $this->mail->Password = env('MAIL_PASSWORD'); 
         $this->mail->SMTPSecure = env('MAIL_ENCRYPTION'); 
         $this->mail->Port = env('MAIL_PORT'); 
         $this->mail->setFrom(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
 
+        $this->mail->Username = config('mail.username');
+        $this->mail->Password = config('mail.password');
+        $this->mail->SMTPSecure = 'tls';
+        $this->mail->Port = config('mail.port');
+
+
+        $fromAddress = config('mail.from.address');
+        $fromName = config('mail.from.name');
+
+        if (empty($fromAddress)) {
+            throw new \Exception("MAIL_FROM_ADDRESS is not set.");
+        }
+
+        $this->mail->setFrom($fromAddress, $fromName);
         $this->mail->isHTML(true);
     }
 

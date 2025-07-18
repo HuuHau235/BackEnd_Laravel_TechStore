@@ -45,6 +45,14 @@ Route::prefix('admin')->group(function () {
     Route::get('/product/charging', [ProductCategoryController::class, 'getChargingAccessory']);
     Route::get('/product/tv', [ProductCategoryController::class, 'getTV']);
     Route::get('/product/air-conditioner', [ProductCategoryController::class, 'getAirConditioner']);
+    Route::get('/products/stock-statistics', [ProductController::class, 'getStockStatistics']);
+    Route::get('/group-by-category', [ProductController::class, 'getProductsGroupedByCategory']);
+    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+Route::put('update/products/{id}', [ProductCategoryController::class, 'update']);
+Route::get('/categories', [ProductCategoryController::class, 'index']);
+Route::get('edit/products/{id}', [ProductCategoryController::class, 'show']);
+Route::post('create/products', [ProductCategoryController::class, 'store']);
+Route::get('/promotion-types', [ProductController::class, 'getPromotionTypes']);
 
 });
 
@@ -58,6 +66,7 @@ Route::prefix('products')->group(function () {
     Route::get('/top-images', [CategoryController::class, 'GetImage']);
     Route::get('/search', [ProductController::class, 'getProductByKeyWord']);
     Route::get('/all-categories', [CategoryController::class, 'index']);
+
 
 });
 // ==============================
@@ -107,6 +116,7 @@ Route::middleware('auth:sanctum')->prefix('user')->group(function () {
     Route::post('/cart/add', [ProductController::class, 'addToCart']);
     Route::get('/order/confirmation', [OrderController::class, 'getConfirmationDetails']);
     Route::post('/order/confirm-payment', [OrderController::class, 'confirmPayment']);
+    Route::get('/order-history', [OrderController::class, 'getOrderHistoryByDate']);
 });
 
 Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
@@ -118,15 +128,15 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/product/{productId}/detail',        [ProductController::class, 'getProductDetail']);
-    Route::get('/product/{productId}/related',       [ProductController::class, 'getRelatedProducts']);
-    Route::post('/product/add-to-cart',              [ProductController::class, 'add_to_cart']);
-    Route::post('/product/add-to-wishlist',          [ProductController::class, 'add_to_wishlist']);
+    Route::get('/product/{productId}/detail', [ProductController::class, 'getProductDetail']);
+    Route::get('/product/{productId}/related', [ProductController::class, 'getRelatedProducts']);
+    Route::post('/product/add-to-cart', [ProductController::class, 'add_to_cart']);
+    Route::post('/product/add-to-wishlist', [ProductController::class, 'add_to_wishlist']);
     Route::post('/product/remove-from-wishlist', [ProductController::class, 'removeFromWishlist']);
-    Route::post('/product/buy-now',                  [ProductController::class, 'buyNow']);
-    Route::get('/reviews/product/{productId}',       [ReviewController::class, 'getReviewsByProduct']);
+    Route::post('/product/buy-now', [ProductController::class, 'buyNow']);
+    Route::get('/reviews/product/{productId}', [ReviewController::class, 'getReviewsByProduct']);
     Route::get('/specification/product/{productId}', [ProductSpecificationController::class, 'getByProductId']);
-    Route::get('/description/product/{productId}',   [ProductDescriptionController::class, 'getByProductId']);
+    Route::get('/description/product/{productId}', [ProductDescriptionController::class, 'getByProductId']);
     Route::post('/product/{productId}/review', [ReviewController::class, 'storeReview']);
 });
 
@@ -148,6 +158,7 @@ Route::prefix('user')->group(function () {
     Route::get('/product/index', [ProductController::class, 'index']);
     Route::get('/product/promoted', [ProductController::class, 'getPromotedProducts']);
     Route::get('/product/categories', [ProductController::class, 'getProductCategories']);
+    
 
 
     Route::get('/wishlist/{id}', [ProductFavoriteController::class, 'getUserFavorites']);
@@ -156,6 +167,7 @@ Route::prefix('user')->group(function () {
     // Order
     Route::post('/orders/create', [OrderController::class, 'createOrder']);
     Route::put('/orders/{orderId}/update-info', [OrderController::class, 'updateOrderInfo']);
+    Route::delete('/order-history/delete', [OrderController::class, 'deleteHistory']);
 
     // VnPay
     Route::post('/vnpay/create-payment', [VnPayController::class, 'createPayment'])->name('vnpay.create');

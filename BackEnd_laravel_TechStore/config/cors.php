@@ -14,13 +14,13 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+   'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-    'http://localhost:3000', // Giữ lại cho quá trình phát triển cục bộ
-    'https://frontendreacttechstore-production.up.railway.app', // <--- THAY THẾ BẰNG URL THỰC TẾ CỦA FRONTEND CỦA BẠN TRÊN RAILWAY
+        'http://localhost:3000', // Giữ lại cho quá trình phát triển cục bộ
+        'https://frontendreacttechstore-production.up.railway.app', // <--- THAY THẾ BẰNG URL THỰC TẾ CỦA FRONTEND CỦA BẠN TRÊN RAILWAY
     ],
 
     'allowed_origins_patterns' => [],
@@ -31,5 +31,5 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => true, 
+    'supports_credentials' => true,
 ];
