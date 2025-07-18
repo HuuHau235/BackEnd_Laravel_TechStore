@@ -17,9 +17,9 @@ class MailerService
         $this->mail->SMTPAuth = true;
         $this->mail->Username = env('MAIL_USERNAME'); 
         $this->mail->Password = env('MAIL_PASSWORD'); 
-        $this->mail->SMTPSecure = 'tls';
+        $this->mail->SMTPSecure = env('MAIL_ENCRYPTION'); 
         $this->mail->Port = env('MAIL_PORT'); 
-        $this->mail->setFrom(env('MAIL_USERNAME'), env('MAIL_FROM_NAME'));
+        $this->mail->setFrom(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
 
         $this->mail->isHTML(true);
     }
