@@ -15,4 +15,8 @@ class CategoryRepository
     {
         return Category::findOrFail($id);
     }
+    public function getCategoriesByID()
+    {
+        return Category::whereHas('blogs')->get();
+    }
 }

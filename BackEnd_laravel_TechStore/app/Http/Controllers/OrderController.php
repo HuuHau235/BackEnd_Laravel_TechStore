@@ -107,14 +107,14 @@ class OrderController extends Controller
             // ]);
 
             $order = Order::create([
-    'user_id' => $userId,
-    'order_date' => now(),
-    'status' => 'pending',
-    'shipping_option' => "free",
-    'total_amount' => $total,
-    'coupon_code' => null,
-    'discount' => 0,
-]);
+                'user_id' => $userId,
+                'order_date' => now(),
+                'status' => 'pending',
+                'shipping_option' => "free",
+                'total_amount' => $total,
+                'coupon_code' => null,
+                'discount' => 0,
+            ]);
 
             foreach ($request->products as $product) {
                 OrderDetail::create([
@@ -126,11 +126,11 @@ class OrderController extends Controller
             }
 
             Payment::create([
-    'order_id' => $order->id,
-    'method' => 'cash', // hoặc từ $request->method nếu cần
-    'status' => 'pending',
-    'payment_date' => now(),
-]);
+                'order_id' => $order->id,
+                'method' => 'cash', // hoặc từ $request->method nếu cần
+                'status' => 'pending',
+                'payment_date' => now(),
+            ]);
 
             DB::commit();
 
@@ -180,20 +180,20 @@ class OrderController extends Controller
         ]);
     }
 
-public function deleteHistory(Request $request)
-{
-    $orderId = $request->input('order_id');
+    public function deleteHistory(Request $request)
+    {
+        $orderId = $request->input('order_id');
 
-    $order = Order::find($orderId);
+        $order = Order::find($orderId);
 
-    if (!$order) {
-        return response()->json(['message' => 'Order not found'], 404);
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        $order->orderDetails()->delete();
+        $order->delete();
+
+        return response()->json(['message' => 'Order deleted successfully']);
     }
-
-    $order->orderDetails()->delete();
-    $order->delete();
-
-    return response()->json(['message' => 'Order deleted successfully']);
-}
 
 }

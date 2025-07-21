@@ -48,11 +48,11 @@ Route::prefix('admin')->group(function () {
     Route::get('/products/stock-statistics', [ProductController::class, 'getStockStatistics']);
     Route::get('/group-by-category', [ProductController::class, 'getProductsGroupedByCategory']);
     Route::delete('/products/{id}', [ProductController::class, 'destroy']);
-Route::put('update/products/{id}', [ProductCategoryController::class, 'update']);
-Route::get('/categories', [ProductCategoryController::class, 'index']);
-Route::get('edit/products/{id}', [ProductCategoryController::class, 'show']);
-Route::post('create/products', [ProductCategoryController::class, 'store']);
-Route::get('/promotion-types', [ProductController::class, 'getPromotionTypes']);
+    Route::put('update/products/{id}', [ProductCategoryController::class, 'update']);
+    Route::get('/categories', [ProductCategoryController::class, 'index']);
+    Route::get('edit/products/{id}', [ProductCategoryController::class, 'show']);
+    Route::post('create/products', [ProductCategoryController::class, 'store']);
+    Route::get('/promotion-types', [ProductController::class, 'getPromotionTypes']);
 
 });
 
@@ -117,6 +117,10 @@ Route::middleware('auth:sanctum')->prefix('user')->group(function () {
     Route::get('/order/confirmation', [OrderController::class, 'getConfirmationDetails']);
     Route::post('/order/confirm-payment', [OrderController::class, 'confirmPayment']);
     Route::get('/order-history', [OrderController::class, 'getOrderHistoryByDate']);
+
+     Route::put('/orders/{orderId}/update-info', [OrderController::class, 'updateOrderInfo']);
+    Route::post('/orders/create', [OrderController::class, 'createOrder']);
+    Route::delete('/order-history/delete', [OrderController::class, 'deleteHistory']);
 });
 
 Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
@@ -158,7 +162,7 @@ Route::prefix('user')->group(function () {
     Route::get('/product/index', [ProductController::class, 'index']);
     Route::get('/product/promoted', [ProductController::class, 'getPromotedProducts']);
     Route::get('/product/categories', [ProductController::class, 'getProductCategories']);
-    
+
 
 
     Route::get('/wishlist/{id}', [ProductFavoriteController::class, 'getUserFavorites']);
@@ -168,7 +172,6 @@ Route::prefix('user')->group(function () {
     Route::post('/orders/create', [OrderController::class, 'createOrder']);
     Route::put('/orders/{orderId}/update-info', [OrderController::class, 'updateOrderInfo']);
     Route::delete('/order-history/delete', [OrderController::class, 'deleteHistory']);
-
     // VnPay
     Route::post('/vnpay/create-payment', [VnPayController::class, 'createPayment'])->name('vnpay.create');
     Route::get('/vnpay/return', [VnPayController::class, 'handleReturn'])->name('vnpay.return');
@@ -177,6 +180,12 @@ Route::prefix('user')->group(function () {
     Route::post('/orders/confirm-payment', [PaymentController::class, 'confirm']);
     Route::post('/orders/create', [OrderController::class, 'create']);
     Route::get('/orders/{order}', [OrderController::class, 'show']);
+
+
+    Route::get('/vnpay-payment', [VnpayController::class, 'createPayment'])->name('vnpay.payment');
+    Route::get('/vnpay-return', [VnpayController::class, 'handleReturn'])->name('vnpay.return');
+    Route::post('/create-payment', [VnpayController::class, 'createPayment']);
+    Route::get('/vnpay-return', [VnpayController::class, 'vnpayReturn']);
 });
 
 
