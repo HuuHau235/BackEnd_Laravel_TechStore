@@ -25,12 +25,19 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy existing application directory
+# Copy source code
 COPY . /var/www
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www
+
+# Install Laravel dependencies and run migration
+RUN composer install \
+    && cp .env.example .env \
+    && php artisan key:generate \
+    && php artisan config:cache \
+    && php artisan migrate --force
 
 # Expose port
 EXPOSE 8000
