@@ -180,20 +180,20 @@ class OrderController extends Controller
         ]);
     }
 
-public function deleteHistory(Request $request)
-{
-    $orderId = $request->input('order_id');
+    public function deleteHistory(Request $request)
+    {
+        $orderId = $request->input('order_id');
 
-    $order = Order::find($orderId);
+        $order = Order::find($orderId);
 
-    if (!$order) {
-        return response()->json(['message' => 'Order not found'], 404);
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        $order->orderDetails()->delete();
+        $order->delete();
+
+        return response()->json(['message' => 'Order deleted successfully']);
     }
-
-    $order->orderDetails()->delete();
-    $order->delete();
-
-    return response()->json(['message' => 'Order deleted successfully']);
-}
 
 }

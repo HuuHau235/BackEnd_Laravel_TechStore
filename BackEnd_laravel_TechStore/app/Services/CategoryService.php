@@ -12,10 +12,10 @@ class CategoryService
         $this->categoryRepo = $categoryRepo;
     }
 
-    // public function getCategoriesByID()
-    // {
-    //     return $this->categoryRepo->getCategoriesByID();
-    // }
+    public function getCategoriesByID()
+    {
+        return $this->categoryRepo->getCategoriesByID();
+    }
     
 
     public function getAll()
