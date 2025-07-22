@@ -18,31 +18,42 @@ RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
     gnupg \
-    ca-certificates
+    ca-certificates \
+    nodejs \
+    npm \
+    nginx
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath gd
 
 # ✅ Install Composer
-RUN curl -sS https://getcomposer.org/installer | php \
-    && mv composer.phar /usr/local/bin/composer
+RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer
 
-# ✅ Install Node.js + npm (v16 LTS)
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
-    && apt-get install -y nodejs
+# ✅ Install Node.js & npm (v16 LTS) — đúng cách
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
+    apt-get install -y nodejs
 
-# Copy application files
+# Copy source code
 COPY . /app
 
-# ✅ Install Laravel & frontend (if needed)
-RUN composer install --ignore-platform-reqs
+# ✅ Laravel install dependencies
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-reqs
 
-# 🔹 Only run if you use Vite or frontend in Laravel
+# ✅ Build frontend (Vite / React)
 RUN npm install && npm run build
 
-# Permissions (optional)
-RUN chown -R www-data:www-data /app
+# ✅ Set permissions (nếu dùng Laravel storage/logs/cache)
+RUN chown -R www-data:www-data /app \
+    && chmod -R 775 /app/storage /app/bootstrap/cache
 
+# ✅ Generate app key, config cache & migrate database
+RUN php artisan key:generate && \
+    php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan migrate --force
+
+# Expose port
 EXPOSE 9000
 
+# Start PHP-FPM
 CMD ["php-fpm"]
