@@ -16,7 +16,9 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libpq-dev \
     libcurl4-openssl-dev \
-    libssl-dev
+    libssl-dev \
+    gnupg \
+    ca-certificates
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath gd
@@ -25,17 +27,22 @@ RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath gd
 RUN curl -sS https://getcomposer.org/installer | php \
     && mv composer.phar /usr/local/bin/composer
 
-# Copy existing application files
+# ✅ Install Node.js + npm (v16 LTS)
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
+    && apt-get install -y nodejs
+
+# Copy application files
 COPY . /app
 
-# ✅ Install Laravel dependencies and run setup
-RUN composer install && php artisan config:cache && php artisan migrate --force
+# ✅ Install Laravel & frontend (if needed)
+RUN composer install --ignore-platform-reqs
 
-# Set permissions if needed
+# 🔹 Only run if you use Vite or frontend in Laravel
+RUN npm install && npm run build
+
+# Permissions (optional)
 RUN chown -R www-data:www-data /app
 
-# Expose port 9000 (if needed)
 EXPOSE 9000
 
-# Start the application
 CMD ["php-fpm"]
