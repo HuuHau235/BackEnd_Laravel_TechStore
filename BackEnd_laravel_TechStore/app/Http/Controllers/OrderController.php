@@ -107,14 +107,14 @@ class OrderController extends Controller
             // ]);
 
             $order = Order::create([
-    'user_id' => $userId,
-    'order_date' => now(),
-    'status' => 'pending',
-    'shipping_option' => "free",
-    'total_amount' => $total,
-    'coupon_code' => null,
-    'discount' => 0,
-]);
+                'user_id' => $userId,
+                'order_date' => now(),
+                'status' => 'pending',
+                'shipping_option' => "free",
+                'total_amount' => $total,
+                'coupon_code' => null,
+                'discount' => 0,
+            ]);
 
             foreach ($request->products as $product) {
                 OrderDetail::create([
@@ -126,11 +126,11 @@ class OrderController extends Controller
             }
 
             Payment::create([
-    'order_id' => $order->id,
-    'method' => 'cash', // hoặc từ $request->method nếu cần
-    'status' => 'pending',
-    'payment_date' => now(),
-]);
+                'order_id' => $order->id,
+                'method' => 'cash', // hoặc từ $request->method nếu cần
+                'status' => 'pending',
+                'payment_date' => now(),
+            ]);
 
             DB::commit();
 
