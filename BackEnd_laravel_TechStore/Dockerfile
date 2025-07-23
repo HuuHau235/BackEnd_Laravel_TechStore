@@ -32,11 +32,11 @@ COPY . .
 # Cài Laravel dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-reqs
 
-# Laravel setup
-RUN php artisan key:generate && \
-    php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan migrate --force
+# # Laravel setup
+# RUN php artisan key:generate && \
+#     php artisan config:cache && \
+#     php artisan route:cache && \
+#     php artisan migrate --force
 
 # Set permissions
 RUN chown -R www-data:www-data /app && \
