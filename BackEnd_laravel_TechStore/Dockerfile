@@ -1,9 +1,9 @@
-FROM php:8.2-fpm
+FROM php:8.2-apache
 
 # Set working directory
-WORKDIR /app
+WORKDIR /var/www/html
 
-# Install system dependencies
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -20,6 +20,9 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     ca-certificates
 
+# Enable Apache Rewrite module
+RUN a2enmod rewrite
+
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath gd
 
@@ -29,16 +32,23 @@ RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/lo
 # Copy source code
 COPY . .
 
-# Install Laravel dependencies
+# Laravel dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-reqs
 
+# Laravel setup (comment if fails)
+# RUN php artisan key:generate && \
+#     php artisan config:cache && \
+#     php artisan route:cache && \
+#     php artisan migrate --force
+
 # Set permissions
-RUN chown -R www-data:www-data /app && \
-    chmod -R 775 /app/storage /app/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Expose the port Render will use
-ENV PORT=8080
-EXPOSE 8080
+# Apache config: allow .htaccess
+RUN sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
 
-# Start Laravel server using artisan
-CMD php artisan serve --host=0.0.0.0 --port=$PORT
+# Expose port
+EXPOSE 80
+
+CMD ["apache2-foreground"]
